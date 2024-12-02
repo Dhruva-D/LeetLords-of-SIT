@@ -1,4 +1,7 @@
 const USER = require('../models/user')
+const { LeetCode } = require('leetcode-query')
+
+const leetcode = new LeetCode();
 
 async function handelAddNewUser(req, res) {
   const body = req.body;
@@ -25,6 +28,14 @@ async function handelAddNewUser(req, res) {
   return res.json({user: body.user, name: body.name})
 } 
 
+async function handelGetUser(req, res) {
+  const username = req.params.username
+  const userData = await leetcode.user(username);
+
+  return res.json(userData)
+}
+
 module.exports = {
   handelAddNewUser,
-}  
+  handelGetUser,
+} 

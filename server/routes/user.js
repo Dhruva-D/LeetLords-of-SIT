@@ -1,10 +1,10 @@
 const express = require('express')
-const { handelAddNewUser } = require('../controllers/user')
+const { handelAddNewUser, handelGetUser } = require('../controllers/user')
 
 const router = express.Router()
 
 router.post('/users', handelAddNewUser)
-// router.get('/', )
+router.get('/:username', handelGetUser)
 
 
-module.exports = router; 
+module.exports = router;

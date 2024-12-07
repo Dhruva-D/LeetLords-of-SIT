@@ -45,6 +45,7 @@ app.get('/api/leaderboard/:username', async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 async function fetchData() {
   const username = document.getElementById('username').value;
   const userDataDiv = document.getElementById('userData');

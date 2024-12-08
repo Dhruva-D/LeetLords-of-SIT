@@ -4,6 +4,8 @@ const App = () => {
  
   const [track,setTrack] = useState('Total Ranking')
 
+  const userData = JSON.parse(localStorage.getItem('userData'))
+
   const changeTable = (event) =>{
     const content = event.target.innerText
     setTrack(content)

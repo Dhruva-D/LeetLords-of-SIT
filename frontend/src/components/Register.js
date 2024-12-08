@@ -1,6 +1,10 @@
 import React, { useRef } from 'react'
+import { useNavigate } from 'react-router-dom';
+
 
 const Register = () => {
+
+  const navigate = useNavigate()
 
   const username = useRef(null)
   const linkedIn = useRef(null)
@@ -9,6 +13,7 @@ const Register = () => {
   const handleClick = (e) =>{
 
     e.preventDefault()
+    
 
     const userData = {
       username: username.current.value,
@@ -20,6 +25,8 @@ const Register = () => {
 
     const data = JSON.parse(localStorage.getItem('userData'));
     console.log(data);
+
+    navigate('/')
   }
 
   return (

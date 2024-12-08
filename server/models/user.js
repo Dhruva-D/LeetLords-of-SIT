@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     require: true,
     unique: true,
   },
-  //usn, branch, year, bio, so we can make a profiel for each of them (if it works)
+  //usn, linkedin , github , so we can make a profiel for each of them (if it works)
 });
 
 const USER = mongoose.model("user", userSchema)

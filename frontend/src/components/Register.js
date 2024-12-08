@@ -1,6 +1,7 @@
 import React, { useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
-
+import { Bounce, Slide, ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
 
@@ -13,7 +14,17 @@ const Register = () => {
   const handleClick = (e) =>{
 
     if(!username.current.value || !linkedIn.current.value || !git.current.value){
-      //react toastify barutte
+      toast.error('Enter the missing field', {
+        position: "top-right",
+        autoClose:3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+        transition: Bounce,
+        });
       return
     }
 
@@ -26,11 +37,26 @@ const Register = () => {
     const data = JSON.parse(localStorage.getItem('userData'));
     console.log(data);
 
-    navigate('/')
+    toast.success('Successfully added', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: 0,
+      theme: "dark",
+      transition: Bounce,
+    });
+
+    setTimeout(() => {
+      navigate('/')
+    }, 4000);
   }
 
   return (
     <div className='bg-customGray min-h-screen w-screen py-16 px-1 md:p-16'>
+      <ToastContainer />
       <form className='text-slate-200 w-[90%] rounded-lg px-4 md:w-1/2 bg-slate-900 mx-auto md:px-10 md:py-4'>
         <h1 className='text-5xl font-bold underline underline-offset-4 text-center'>Register</h1>
         <div className='mt-10 flex flex-col items-start gap-3'>

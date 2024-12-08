@@ -12,14 +12,14 @@ const Register = () => {
 
   const handleClick = (e) =>{
 
-    e.preventDefault()
-    
+    if(!username.current.value || !linkedIn.current.value || !git.current.value){
+      //react toastify barutte
+      return
+    }
 
-    const userData = {
-      username: username.current.value,
-      linkedIn: linkedIn.current.value,
-      git: git.current.value,
-    };
+    e.preventDefault()
+
+    const userData = username.current.value
 
     localStorage.setItem('userData', JSON.stringify(userData));
 
@@ -46,7 +46,7 @@ const Register = () => {
           <input ref={git} type='text' name='githubId' placeholder='Enter your github Id' className='p-2 rounded-xl text-black w-[90%]' required/>
         </div>
         <button onClick={handleClick} className="cursor-pointer relative group overflow-hidden border-2 px-8 py-2 border-customBlue mx-[35%] mt-16 mb-2 rounded-sm">
-          <span className="font-bold text-white text-xl relative z-10 group-hover:text-customBlue duration-500">Blink</span>
+          <span className="font-bold text-white text-xl relative z-10 group-hover:text-customBlue duration-500">Submit</span>
           <span className="absolute top-0 left-0 w-full bg-customBlue duration-500 group-hover:-translate-x-full h-full"></span>
           <span className="absolute top-0 left-0 w-full bg-customBlue duration-500 group-hover:translate-x-full h-full"></span>
           

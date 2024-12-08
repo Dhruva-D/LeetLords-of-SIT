@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const App = () => {
  
   const [track,setTrack] = useState('Total Ranking')
 
   const userData = JSON.parse(localStorage.getItem('userData'))
+  console.log(userData)
 
   const changeTable = (event) =>{
     const content = event.target.innerText
@@ -22,9 +24,19 @@ const App = () => {
             Weekly Ranking
         </div>
       </div>
-      <div className='h-80 md:w-[40%] bg-slate-900 rounded-lg my-12 mx-auto text-white'>
+      {userData && <div className='h-80 md:w-[40%] bg-slate-900 rounded-lg my-12 mx-auto text-white'>
         i am personel content
-      </div>
+      </div>}
+      {!userData && <Link to={'/register'} className='flex items-center justify-center'>
+        <button className="cursor-pointer relative group overflow-hidden border-2 px-8 py-2 border-customBlue mt-16 mb-2 rounded-sm">
+          <span className="font-bold text-white text-xl relative z-10 group-hover:text-customBlue duration-500">Register Your Self</span>
+          <span className="absolute top-0 left-0 w-full bg-customBlue duration-500 group-hover:-translate-x-full h-full"></span>
+          <span className="absolute top-0 left-0 w-full bg-customBlue duration-500 group-hover:translate-x-full h-full"></span>
+          
+            <span className="absolute top-0 left-0 w-full bg-customBlue duration-500 delay-300 group-hover:-translate-y-full h-full"></span>
+          <span className="absolute delay-300 top-0 left-0 w-full bg-customBlue duration-500 group-hover:translate-y-full h-full"></span>
+        </button>
+      </Link>}
       <div className='h-[4px] w-full rounded-lg bg-slate-700 my-10'></div>
       <div className='h-fit w-[100%] md:w-[80%] bg-slate-900 mx-auto rounded-full flex items-center justify-center text-white p-3'>
         i am leaderboard

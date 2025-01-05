@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeetLords-of-SIT</title>
+  <style>
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #1e1e2f; /* Deep dark background */
+  color: #e4e6eb; /* Soft light text */
+  line-height: 1.6;
+}
+
+header {
+  background-color: #252533; /* Dark background for header */
+  padding: 15px;
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  color: #ffffff;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #6a6ff7, #a78bfa); /* Gradient for a vibrant look */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  cursor: pointer;
+}
+
+nav {
+  margin-top: 20px;
+}
+
+nav a {
+  color: #b0b3c8;
+  text-decoration: none;
+  margin: 0 20px;
+  font-size: 1.1rem;
+}
+
+nav a:hover {
+  color: #6a6ff7;
+  text-decoration: underline;
+}
+
+.content {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 40px;
+  background: #252533;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* Leaderboard Content */
+.leaderboard h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+table th, table td {
+  padding: 18px;
+  text-align: left;
+  border-bottom: 1px solid #3c3e4b;
+}
+
+table th {
+  background-color: #292a3a;
+  font-weight: 600;
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: #b0b3c8;
+}
+
+table tr:nth-child(even) {
+  background-color: #2d2e3f;
+}
+
+table tr:hover {
+  background-color: #37384b;
+  transition: background-color 0.2s ease;
+}
+
+table td {
+  font-size: 1rem;
+  color: #e4e6eb;
+}
+
+table td:first-child {
+  font-weight: bold;
+  color: #6a6ff7;
+}
+
+/* Register Form */
+.form-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 30px;
+  background: #252533;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+}
+
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #ffffff;
+}
+
+.form-container input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #444;
+  background-color: #333;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form-container input[type="submit"] {
+  background-color: #6a6ff7;
+  border: none;
+  cursor: pointer;
+}
+
+.form-container input[type="submit"]:hover {
+  background-color: #4e4ecf;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  nav {
+    margin-top: 15px;
+  }
+
+  nav a {
+    margin: 0 10px;
+    font-size: 1rem;
+  }
+
+  .content {
+    padding: 20px;
+  }
+
+  table th, table td {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
+  .form-container {
+    padding: 20px;
+  }
+
+  .form-container input {
+    font-size: 0.9rem;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1 onclick="window.location.href='/'">LeetLords-of-SIT</h1>
+    <nav>
+      <a href="/">Leaderboard</a>
+      <a href="/about">About</a>
+      <a href="/register">Register</a>
+    </nav>
+  </header>
+
+  <!-- Leaderboard Page Content -->
+  <div id="leaderboard-content" class="content" style="display: block;">
+    <h2>LeetCode Leaderboard</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>SIT Rank</th>
+          <th>Global Rank</th>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Problems Solved</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach((user, index) => { %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= user.rank %></td>
+            <td><%= user.name %></td>
+            <td><%= user.username %></td>
+            <td><%= user.solved %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- About Page Content (Hidden initially) -->
+  <div id="about-content" class="content" style="display: none;">
+    <h2>About LeetLords-of-SIT</h2>
+    <p>A dynamic LeetCode leaderboard for SIT students, tracking overall and weekly coding performance. Powered by the LeetCode API, this project fosters competitive coding spirit and celebrates coding excellence! #DeCoders</p>
+  </div>
+
+  <!-- Register Page Content -->
+<div id="register-content" class="form-container" style="display: none;">
+  <h2>Register to Add Yourself to the Leaderboard</h2>
+  <form id="register-form">
+    <input type="text" name="name" id="name" placeholder="Enter Your Name" required>
+    <input type="text" name="user" id="user" placeholder="Enter Your LeetCode Username" required>
+    <input type="submit" value="Register">
+  </form>
+  <div id="error-message" style="color: red; display: none;"></div>
+  <div id="success-message" style="color: green; display: none;"></div>
+</div>
+
+  <script>
+    // Navigation Logic
+    const aboutLink = document.querySelector('a[href="/about"]');
+    const registerLink = document.querySelector('a[href="/register"]');
+    const leaderboardLink = document.querySelector('a[href="/leaderboard"]');
+    const aboutContent = document.getElementById('about-content');
+    const registerContent = document.getElementById('register-content');
+    const leaderboardContent = document.getElementById('leaderboard-content');
+
+    aboutLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      aboutContent.style.display = 'block';
+      registerContent.style.display = 'none';
+      leaderboardContent.style.display = 'none';
+    });
+
+    registerLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      aboutContent.style.display = 'none';
+      registerContent.style.display = 'block';
+      leaderboardContent.style.display = 'none';
+    });
+
+    leaderboardLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      aboutContent.style.display = 'none';
+      registerContent.style.display = 'none';
+      leaderboardContent.style.display = 'block';
+    });
+
+    // Handle the form submission
+  const form = document.getElementById('register-form');
+  const errorMessage = document.getElementById('error-message');
+  const successMessage = document.getElementById('success-message');
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Get form data
+    const name = document.getElementById('name').value;
+    const user = document.getElementById('user').value;
+
+    // Prepare the request body
+    const requestBody = {
+      user: user,
+      name: name,
+    };
+
+    try {
+      // Send data to the backend
+      const response = await fetch('/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      // Handle the server response
+      const data = await response.json();
+
+      if (response.ok) {
+        successMessage.style.display = 'block';
+        successMessage.textContent = `Successfully registered ${data.name} with username ${data.user}`;
+        errorMessage.style.display = 'none';
+      } else {
+        successMessage.style.display = 'none';
+        errorMessage.style.display = 'block';
+        errorMessage.textContent = data.error || 'Something went wrong';
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      successMessage.style.display = 'none';
+      errorMessage.style.display = 'block';
+      errorMessage.textContent = 'Network error. Please try again later.';
+    }
+  });
+  
+  </script>
+</body>
+</html>

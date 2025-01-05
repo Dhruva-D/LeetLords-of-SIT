@@ -5,8 +5,13 @@ const leetcode = new LeetCode();
 
 async function handelAddNewUser(req, res) {
   const body = req.body;
-  const user = body.user;
   const name = body.name;
+  const user = body.user;
+  
+  console.log(body);
+  console.log(name);
+  console.log(user);
+  
   
   if(!user) return res.status(400).json({error: 'Enter Username'})
   if(!name) return res.status(400).json({error: 'Enter Your name'})
@@ -29,11 +34,17 @@ async function handelAddNewUser(req, res) {
 } 
 
 async function handelGetUser(req, res) {
-  const username = req.params.username
-  const userData = await leetcode.user(username);
-
-  return res.json(userData)
+  try {
+    const username = req.params.username;
+    const userData = await leetcode.user(username);
+    console.log(userData);
+    return res.json(userData);
+  } catch (error) {
+    console.error('Error fetching user data:', error.message);
+    return res.status(500).json({ message: 'Error fetching user data', error: error.message });
+  }
 }
+
 
 module.exports = {
   handelAddNewUser,

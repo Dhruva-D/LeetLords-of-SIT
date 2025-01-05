@@ -13,6 +13,7 @@ async function handelArrangeLeaderboard(req, res) {
       users.map(async (user) => {
         try {
           const stats = await leetcode.user(user.userId);
+          
           return {
             name: user.name,
             username: user.userId,
@@ -31,7 +32,6 @@ async function handelArrangeLeaderboard(req, res) {
 
     // Sort users by rank
     validUserRanks.sort((a, b) => a.rank - b.rank);
-    console.log(validUserRanks);
     
     // Render the leaderboard using EJS
     res.render('home', { users: validUserRanks });

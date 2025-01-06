@@ -32,13 +32,27 @@ async function handelAddNewUser(req, res) {
 async function handelGetUser(req, res) {
   try {
     const username = req.params.username;
-    const userData = await leetcode.user(username);
-    return res.json(userData);
+    
+    // Fetch user data from LeetCode API
+    const contestData = await leetcode.user(username);
+    const userData = await leetcode.user_contest_info(username);
+
+    // Return the response with status code 200 and the data
+    return res.status(200).json({
+      userContestRanking: contestData,
+      userContestRankingHistory: userData
+    });
   } catch (error) {
     console.error('Error fetching user data:', error.message);
-    return res.status(500).json({ message: 'Error fetching user data', error: error.message });
+    
+    // Return an error response with status code 500
+    return res.status(500).json({ 
+      message: 'Error fetching user data', 
+      error: error.message 
+    });
   }
 }
+
 
 
 module.exports = {

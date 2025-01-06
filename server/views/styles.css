@@ -1,0 +1,230 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #1e1e2f; /* Deep dark background */
+  color: #e4e6eb; /* Soft light text */
+  line-height: 1.6;
+}
+
+header {
+  background-color: #252533; /* Dark background for header */
+  padding: 15px;
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  color: #ffffff;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #6a6ff7, #a78bfa); /* Gradient for a vibrant look */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  cursor: pointer;
+}
+
+nav {
+  margin-top: 20px;
+}
+
+nav a {
+  color: #b0b3c8;
+  text-decoration: none;
+  margin: 0 20px;
+  font-size: 1.1rem;
+}
+
+nav a:hover {
+  color: #6a6ff7;
+  text-decoration: underline;
+}
+
+.content {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 40px;
+  background: #252533;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* Leaderboard Content */
+.leaderboard h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+table th, table td {
+  padding: 18px;
+  text-align: left;
+  border-bottom: 1px solid #3c3e4b;
+}
+
+table th {
+  background-color: #292a3a;
+  font-weight: 600;
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: #b0b3c8;
+}
+
+table tr:nth-child(even) {
+  background-color: #2d2e3f;
+}
+
+table tr:hover {
+  background-color: #37384b;
+  transition: background-color 0.2s ease;
+}
+
+table td {
+  font-size: 1rem;
+  color: #e4e6eb;
+}
+
+table td:first-child {
+  font-weight: bold;
+  color: #6a6ff7;
+}
+
+/* Register Form */
+.form-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 30px;
+  background: #252533;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+}
+
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #ffffff;
+}
+
+.form-container input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #444;
+  background-color: #333;
+  color: #fff;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form-container input[type="submit"] {
+  background-color: #6a6ff7;
+  border: none;
+  cursor: pointer;
+}
+
+.form-container input[type="submit"]:hover {
+  background-color: #4e4ecf;
+}
+
+/* Success and Error Messages */
+.message {
+  display: none;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease-in-out;
+}
+
+.message.success {
+  background-color: #4caf50; /* Green */
+  color: white;
+  border: 1px solid #388e3c;
+}
+
+.message.error {
+  background-color: #f44336; /* Red */
+  color: white;
+  border: 1px solid #d32f2f;
+}
+
+.form-container button {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  background-color: #6a6ff7;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-container button:hover {
+  background-color: #4e4ecf;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  nav {
+    margin-top: 15px;
+  }
+
+  nav a {
+    margin: 0 10px;
+    font-size: 1rem;
+  }
+
+  .content {
+    padding: 20px;
+  }
+
+  table th, table td {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
+  .form-container {
+    padding: 20px;
+  }
+
+  .form-container input {
+    font-size: 0.9rem;
+  }
+}
+/* Fade-in animation for success/error messages */
+@keyframes fadeIn {
+from {
+opacity: 0;
+transform: translateY(20px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+
+}

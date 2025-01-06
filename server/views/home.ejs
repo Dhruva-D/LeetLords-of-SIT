@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LeetLords-of-SIT</title>
+  
   <style>
     /* General Reset */
     * {
@@ -234,9 +235,6 @@
     transform: translateY(0);
   }
 
-  .fade-in {
-    animation: fadeIn 0.5s ease-out;
-  }
 }
 
   </style>
@@ -252,7 +250,7 @@
     </nav>
   </header>
 
-  <!-- Leaderboard Page Content -->
+  <!-- overall Leaderboard Page Content -->
   <div id="leaderboard-content" class="content" style="display: block;">
     <h2>LeetCode Leaderboard</h2>
     <table>
@@ -262,17 +260,44 @@
           <th>Global Rank</th>
           <th>Name</th>
           <th>Username</th>
-          <th>Problems Solved</th>
+          <th>Rating</th>
         </tr>
       </thead>
       <tbody>
-        <% users.forEach((user, index) => { %>
+        <% normalLeaderboard.forEach((user, index) => { %>
           <tr>
             <td><%= index + 1 %></td>
             <td><%= user.rank %></td>
             <td><%= user.name %></td>
             <td><%= user.username %></td>
-            <td><%= user.solved %></td>
+            <td><%= user.rating %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- weekly Leaderboard Page Content -->
+  <div id="leaderboard-content" class="content" style="display: block;">
+    <h2>Weekly Contest Leaderboard</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>SIT Rank</th>
+          <th>Global Rank</th>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% weeklyLeaderboard.forEach((user, index) => { %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= user.rank %></td>
+            <td><%= user.name %></td>
+            <td><%= user.username %></td>
+            <td><%= user.rating %></td>
           </tr>
         <% }); %>
       </tbody>

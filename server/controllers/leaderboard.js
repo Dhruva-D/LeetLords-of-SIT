@@ -15,20 +15,40 @@ async function handelArrangeLeaderboard(req, res) {
           const contestHistory = await leetcode.user_contest_info(user.userId);
           const contests = contestHistory.userContestRankingHistory;
 
-          // Get the latest contest (by startTime)
+          // Identify the latest contest based on startTime
           const latestContest = contests.reduce((latest, contest) => {
-            return contest.startTime > latest.startTime ? contest : latest;
+            return contest.contest.startTime > latest.contest.startTime ? contest : latest;
           }, contests[0]);
 
           // Check if the user attended the latest contest
-          const stats = await leetcode.user_contest_info(user.userId);
+          const attendedLatest = latestContest.attended;
+
+          // Format the contest timing
+          const formatTimestamp = (timestamp) => {
+            const date = new Date(timestamp * 1000);
+            const options = {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            };
+            return date.toLocaleString('en-US', options);
+          };
+
+          const formattedTime = formatTimestamp(latestContest.contest.startTime);
 
           return {
             name: user.name,
             username: user.userId,
-            rating: stats.userContestRanking.rating,
-            rank: stats.userContestRanking.globalRanking,
-            attended: latestContest.attended, // Add attended status for weekly leaderboard
+            rating: contestHistory.userContestRanking.rating,
+            rank: contestHistory.userContestRanking.globalRanking,
+            attended: attendedLatest, // Add attended status for weekly leaderboard
+            trend: latestContest.trendDirection,
+            title: latestContest.contest.title, // Add contest title
+            time: formattedTime, // Add formatted contest timing
           };
         } catch (err) {
           console.error(`Error fetching data for ${user.userId}:`, err);
@@ -41,7 +61,7 @@ async function handelArrangeLeaderboard(req, res) {
     const validUserRanks = userRanks.filter((user) => user !== null);
 
     // Separate users into attended and non-attended for weekly leaderboard
-    const attendedUserRanks = validUserRanks.filter(user => user.attended);
+    const attendedUserRanks = validUserRanks.filter((user) => user.attended);
 
     // Sort all users for the normal leaderboard by rating in descending order
     validUserRanks.sort((a, b) => {

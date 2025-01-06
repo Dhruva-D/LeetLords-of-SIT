@@ -277,32 +277,38 @@
     </table>
   </div>
 
-  <!-- weekly Leaderboard Page Content -->
-  <div id="leaderboard-content" class="content" style="display: block;">
-    <h2>Weekly Contest Leaderboard</h2>
-    <table>
-      <thead>
+  <!-- Weekly Leaderboard Page Content -->
+<div id="leaderboard-content" class="content" style="display: block;">
+  <h2>
+    Weekly Contest Leaderboard - <%= weeklyLeaderboard[0]?.title %> 
+    (<%= weeklyLeaderboard[0]?.time %>)
+  </h2>
+  <table>
+    <thead>
+      <tr>
+        <th>SIT Rank</th>
+        <th>Global Rank</th>
+        <th>Name</th>
+        <th>Username</th>
+        <th>Rating</th>
+        <th>Trend Arrow</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% weeklyLeaderboard.forEach((user, index) => { %>
         <tr>
-          <th>SIT Rank</th>
-          <th>Global Rank</th>
-          <th>Name</th>
-          <th>Username</th>
-          <th>Rating</th>
+          <td><%= index + 1 %></td>
+          <td><%= user.rank %></td>
+          <td><%= user.name %></td>
+          <td><%= user.username %></td>
+          <td><%= user.rating %></td>
+          <td><%= user.trend %></td>
         </tr>
-      </thead>
-      <tbody>
-        <% weeklyLeaderboard.forEach((user, index) => { %>
-          <tr>
-            <td><%= index + 1 %></td>
-            <td><%= user.rank %></td>
-            <td><%= user.name %></td>
-            <td><%= user.username %></td>
-            <td><%= user.rating %></td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
-  </div>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
 
   <!-- About Page Content -->
   <div id="about-content" class="content" style="display: none;">

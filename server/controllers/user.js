@@ -34,13 +34,12 @@ async function handelGetUser(req, res) {
     const username = req.params.username;
     
     // Fetch user data from LeetCode API
-    const contestData = await leetcode.user(username);
-    const userData = await leetcode.user_contest_info(username);
+    const userData = await leetcode.user(username);
+    const contestData = await leetcode.user_contest_info(username);
 
     // Return the response with status code 200 and the data
     return res.status(200).json({
-      userContestRanking: contestData,
-      userContestRankingHistory: userData
+      userContestDetails: contestData,
     });
   } catch (error) {
     console.error('Error fetching user data:', error.message);

@@ -1,10 +1,13 @@
 const express = require('express')
-const { handelAddNewUser, handelGetUser } = require('../controllers/user')
+const { handelAddNewUser } = require('../controllers/user')
 
 const router = express.Router()
 
+/**
+ * @route   POST /api/register
+ * @desc    Register a new user for the leaderboard
+ * @access  Public
+ */
 router.post('/', handelAddNewUser)
-router.get('/getinfo/:username', handelGetUser)
-
 
 module.exports = router;

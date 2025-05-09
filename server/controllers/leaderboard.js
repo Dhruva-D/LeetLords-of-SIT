@@ -1,57 +1,31 @@
-const USER = require('../models/user');
+const User = require('../models/user');
 const { LeetCode } = require('leetcode-query');
 const leetcode = new LeetCode();
 
+/**
+ * Get leaderboard data for both regular and weekly rankings
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 async function handelArrangeLeaderboard(req, res) {
   try {
     // Fetch all users from the database
-    const users = await USER.find({});
+    const users = await User.find({});
+
+    if (users.length === 0) {
+      return res.json({ 
+        normalLeaderboard: [], 
+        weeklyLeaderboard: [] 
+      });
+    }
 
     // Fetch LeetCode data for all users
     const userRanks = await Promise.all(
       users.map(async (user) => {
         try {
-          // Fetch contest history for the user
-          const contestHistory = await leetcode.user_contest_info(user.userId);
-          const contests = contestHistory.userContestRankingHistory;
-
-          // Identify the latest contest based on startTime
-          const latestContest = contests.reduce((latest, contest) => {
-            return contest.contest.startTime > latest.contest.startTime ? contest : latest;
-          }, contests[0]);
-
-          // Check if the user attended the latest contest
-          const attendedLatest = latestContest.attended;
-
-          // Format the contest timing
-          const formatTimestamp = (timestamp) => {
-            const date = new Date(timestamp * 1000);
-            const options = {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-            };
-            return date.toLocaleString('en-US', options);
-          };
-
-          const formattedTime = formatTimestamp(latestContest.contest.startTime);
-
-          return {
-            name: user.name,
-            username: user.userId,
-            rating: contestHistory.userContestRanking.rating,
-            rank: contestHistory.userContestRanking.globalRanking,
-            attended: attendedLatest, // Add attended status for weekly leaderboard
-            trend: latestContest.trendDirection,
-            title: latestContest.contest.title, // Add contest title
-            time: formattedTime, // Add formatted contest timing
-          };
+          return await getUserContestData(user);
         } catch (err) {
-          console.error(`Error fetching data for ${user.userId}:`, err);
+          console.error(`Error fetching data for ${user.userId}:`, err.message);
           return null;
         }
       })
@@ -60,32 +34,128 @@ async function handelArrangeLeaderboard(req, res) {
     // Filter out null results (in case of fetch errors)
     const validUserRanks = userRanks.filter((user) => user !== null);
 
-    // Separate users into attended and non-attended for weekly leaderboard
-    const attendedUserRanks = validUserRanks.filter((user) => user.attended);
+    // For weekly leaderboard, get users who attended the latest contest
+    let weeklyLeaderboard = validUserRanks.filter((user) => user.attended);
 
-    // Sort all users for the normal leaderboard by rating in descending order
-    validUserRanks.sort((a, b) => {
-      const ratingA = parseFloat(a.rating);
-      const ratingB = parseFloat(b.rating);
-      return ratingB - ratingA;
-    });
+    // If no users attended the latest contest, use all users for the weekly leaderboard
+    if (weeklyLeaderboard.length === 0) {
+      weeklyLeaderboard = generateDefaultWeeklyLeaderboard(validUserRanks);
+    }
 
-    // Sort attended users for the weekly leaderboard by rating in descending order
-    attendedUserRanks.sort((a, b) => {
-      const ratingA = parseFloat(a.rating);
-      const ratingB = parseFloat(b.rating);
-      return ratingB - ratingA;
-    });
+    // Sort both leaderboards by rating
+    const normalLeaderboard = sortByRating([...validUserRanks]);
+    weeklyLeaderboard = sortByRating(weeklyLeaderboard);
 
-    // Render the leaderboard using EJS, passing both normal and weekly leaderboards
-    res.render('home', { 
-      normalLeaderboard: validUserRanks, 
-      weeklyLeaderboard: attendedUserRanks 
-    });
+    // Return JSON data
+    res.json({ normalLeaderboard, weeklyLeaderboard });
   } catch (err) {
-    console.error('Error arranging leaderboard:', err);
-    res.status(500).send('Internal Server Error');
+    console.error('Error arranging leaderboard:', err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
+}
+
+/**
+ * Fetch contest data for a user and format it
+ * @param {Object} user - User document from MongoDB
+ * @returns {Object} Formatted user contest data
+ */
+async function getUserContestData(user) {
+  // Fetch contest history for the user
+  const contestHistory = await leetcode.user_contest_info(user.userId);
+  
+  if (!contestHistory.userContestRankingHistory || contestHistory.userContestRankingHistory.length === 0) {
+    return {
+      name: user.name,
+      username: user.userId,
+      rating: contestHistory.userContestRanking?.rating || 0,
+      rank: contestHistory.userContestRanking?.globalRanking || 0,
+      attended: false,
+      trend: "",
+      title: "",
+      time: "",
+    };
+  }
+  
+  const contests = contestHistory.userContestRankingHistory;
+
+  // Identify the latest contest based on startTime
+  const latestContest = contests.reduce((latest, contest) => {
+    return contest.contest.startTime > latest.contest.startTime ? contest : latest;
+  }, contests[0]);
+
+  // Check if the user attended the latest contest
+  const attendedLatest = latestContest.attended;
+
+  // Format the contest timing
+  const formattedTime = formatTimestamp(latestContest.contest.startTime);
+
+  return {
+    name: user.name,
+    username: user.userId,
+    rating: contestHistory.userContestRanking?.rating || 0,
+    rank: contestHistory.userContestRanking?.globalRanking || 0,
+    attended: attendedLatest,
+    trend: latestContest.trendDirection || "",
+    title: latestContest.contest.title || "",
+    time: formattedTime,
+  };
+}
+
+/**
+ * Format timestamp to human-readable time
+ * @param {number} timestamp - Unix timestamp
+ * @returns {string} Formatted date string
+ */
+function formatTimestamp(timestamp) {
+  const date = new Date(timestamp * 1000);
+  const options = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  };
+  return date.toLocaleString('en-US', options);
+}
+
+/**
+ * Generate a default weekly leaderboard when no users attended the latest contest
+ * @param {Array} users - Array of user data
+ * @returns {Array} Default weekly leaderboard
+ */
+function generateDefaultWeeklyLeaderboard(users) {
+  if (users.length === 0) return [];
+  
+  const defaultTitle = "Weekly Contest";
+  const defaultTime = new Date().toLocaleString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  
+  // Add default title and time to each user
+  return users.map(user => ({
+    ...user,
+    title: defaultTitle,
+    time: defaultTime,
+    attended: true // Force attended to true for display purposes
+  }));
+}
+
+/**
+ * Sort users by rating in descending order
+ * @param {Array} users - Array of user data
+ * @returns {Array} Sorted users
+ */
+function sortByRating(users) {
+  return [...users].sort((a, b) => {
+    const ratingA = parseFloat(a.rating) || 0;
+    const ratingB = parseFloat(b.rating) || 0;
+    return ratingB - ratingA;
+  });
 }
 
 module.exports = {

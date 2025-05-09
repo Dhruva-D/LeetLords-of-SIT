@@ -1,22 +1,72 @@
 const express = require('express');
+require('dotenv').config();
 const { connectToMongoDB } = require('./connect');
-const userRoute = require('./routes/user');
-const leaderboardRoute = require('./routes/leaderboard');
 const path = require('path');
+const cors = require('cors');
+const { handelGetUser, testLeetCodeApi } = require('./controllers/user');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-connectToMongoDB("mongodb+srv://Dhruva:8UyTM-vwSQaqAtP@cluster0.r5dk3.mongodb.net/leetlords?retryWrites=true&w=majority&appName=Cluster0")
-.then( () => console.log("Connected to MongoDB")).catch((err) => console.log('error', err))
+// Connect to MongoDB and test LeetCode API
+connectToMongoDB(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("Connected to MongoDB");
+    
+    // Test LeetCode API connectivity after MongoDB connection
+    testLeetCodeApi()
+      .then(success => {
+        if (success) {
+          console.log("LeetCode API connection test completed successfully");
+        } else {
+          console.warn("LeetCode API connection test failed - some features may not work correctly");
+        }
+      })
+      .catch(err => {
+        console.error("Error testing LeetCode API:", err.message);
+      });
+  })
+  .catch((err) => console.log('MongoDB connection error:', err));
 
-app.set("view engine", "ejs");
-app.set("views", path.resolve("./views"));
-
+// Middleware setup
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:5000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/register", userRoute);
-app.use("/", leaderboardRoute);
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// API routes
+app.use('/api/leaderboard', require('./routes/api/leaderboard'));
+app.use('/api/register', require('./routes/user'));
+app.use('/api/user', require('./routes/api/user'));
+
+// Direct route for user info
+app.get('/api/direct/user/:username', handelGetUser);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Server error', message: err.message });
+});
+
+// Serve React static files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../client/build')));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.send('API is running...');
+  });
+}
 
 app.listen(PORT, () => console.log(`Server started at port ${PORT}`));

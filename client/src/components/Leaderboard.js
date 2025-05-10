@@ -243,8 +243,12 @@ const Leaderboard = () => {
   const currentLeaderboard = activeView === 'weekly' ? weeklyLeaderboard : normalLeaderboard;
 
   const renderRankIcon = (rank) => {
-    if (rank <= 3) {
-      return null; // Top 3 ranks are displayed with medals in the podium
+    if (rank === 1) {
+      return <span className="medal gold-medal">🥇</span>;
+    } else if (rank === 2) {
+      return <span className="medal silver-medal">🥈</span>;
+    } else if (rank === 3) {
+      return <span className="medal bronze-medal">🥉</span>;
     }
     return (
       <span className="rank-icon">{rank}</span>
@@ -265,13 +269,6 @@ const Leaderboard = () => {
           </button>
         </div>
         
-        {/* Environment indicator - visible only in development */}
-        {process.env.NODE_ENV !== 'production' && (
-          <div className="environment-indicator">
-            Environment: {process.env.NODE_ENV} | API: {config.apiBaseUrl}
-          </div>
-        )}
-
         <div className="toggle-container">
           <button 
             className={`toggle-button ${activeView === 'all-time' ? 'active' : ''}`}
@@ -318,8 +315,7 @@ const Leaderboard = () => {
                     style={{"--row-index": index}}
                   >
                     <td>
-                      {index >= 3 && renderRankIcon(index + 1)}
-                      {index + 1}
+                      {renderRankIcon(index + 1)}
                     </td>
                     <td>{user.rank}</td>
                     <td>{user.name}</td>

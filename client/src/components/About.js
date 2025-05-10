@@ -18,7 +18,7 @@ const About = () => {
           <section className="about-section">
             <h3>Features</h3>
             <ul>
-              <li>Global Rankings Leaderboard</li>
+              <li>SIT Rankings Leaderboard</li>
               <li>Weekly Contest Performance</li>
               <li>Personal Performance Tracking</li>
               <li>Real-time Data Updates</li>

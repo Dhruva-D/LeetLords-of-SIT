@@ -5,7 +5,6 @@ import Leaderboard from './components/Leaderboard';
 import About from './components/About';
 import Register from './components/Register';
 import UserInfo from './components/UserInfo';
-import ApiDebug from './components/ApiDebug';
 import './App.css';
 
 function App() {
@@ -14,14 +13,12 @@ function App() {
       <div className="App">
         <Header />
         <Routes>
-          <Route path="/" element={<Navigate to="/global" />} />
-          <Route path="/global" element={<Leaderboard />} />
-          <Route path="/weekly" element={<Leaderboard />} />
+          <Route path="/" element={<Navigate to="/leaderboard" />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/user" element={<UserInfo />} />
-          <Route path="/debug" element={<ApiDebug />} />
-          <Route path="*" element={<Navigate to="/global" />} />
+          <Route path="/userinfo" element={<UserInfo />} />
+          <Route path="*" element={<Navigate to="/leaderboard" />} />
         </Routes>
       </div>
     </Router>

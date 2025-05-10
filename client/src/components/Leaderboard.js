@@ -10,6 +10,10 @@ const apiCache = {
   CACHE_DURATION: 5 * 60 * 1000 // 5 minutes in milliseconds
 };
 
+const MAX_RETRIES = 2;
+const INITIAL_TIMEOUT = 15000; // 15 seconds
+const RETRY_DELAY = 1000; // 1 second delay between retries
+
 const Leaderboard = () => {
   const [normalLeaderboard, setNormalLeaderboard] = useState([]);
   const [weeklyLeaderboard, setWeeklyLeaderboard] = useState([]);
@@ -18,18 +22,21 @@ const Leaderboard = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
   const location = useLocation();
+  const [activeView, setActiveView] = useState('all-time'); // 'all-time' or 'weekly'
 
-  const fetchLeaderboards = useCallback(async (forceRefresh = false) => {
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const fetchLeaderboards = useCallback(async (forceRefresh = false, currentRetry = 0) => {
     try {
-      // If refreshing, show the refreshing state instead of full loading
       if (forceRefresh) {
         setRefreshing(true);
       } else {
         setLoading(true);
       }
 
-      // Check if we have valid cached data and not forcing refresh
+      // Check cache first
       const now = new Date().getTime();
       if (!forceRefresh && 
           apiCache.data && 
@@ -42,10 +49,10 @@ const Leaderboard = () => {
         return;
       }
 
-      // Fetch fresh data from API
-      console.log('Fetching fresh leaderboard data');
+      // Fetch fresh data from API with increased timeout
+      console.log(`Fetching fresh leaderboard data (attempt ${currentRetry + 1}/${MAX_RETRIES + 1})`);
       const response = await axios.get('/api/leaderboard', {
-        timeout: 10000 // 10 second timeout
+        timeout: INITIAL_TIMEOUT + (currentRetry * 5000) // Increase timeout with each retry
       });
       
       // Update the cache
@@ -58,11 +65,26 @@ const Leaderboard = () => {
       setLoading(false);
       setRefreshing(false);
       setError(null);
+      setRetryCount(0);
     } catch (err) {
       console.error('Error fetching leaderboard data:', err);
-      setError('Failed to fetch leaderboard data');
+      
+      // Implement retry logic
+      if (currentRetry < MAX_RETRIES) {
+        setError(`Attempt ${currentRetry + 1} failed. Retrying in ${RETRY_DELAY/1000} seconds...`);
+        await delay(RETRY_DELAY);
+        return fetchLeaderboards(forceRefresh, currentRetry + 1);
+      }
+
+      // If all retries failed
+      const errorMessage = err.code === 'ECONNABORTED'
+        ? 'Connection timeout. Please check your internet connection and try again.'
+        : 'Failed to fetch leaderboard data. Please try again.';
+      
+      setError(errorMessage);
       setLoading(false);
       setRefreshing(false);
+      setRetryCount(currentRetry + 1);
     }
   }, []);
 
@@ -94,6 +116,7 @@ const Leaderboard = () => {
 
   // Handle refresh button click
   const handleRefresh = () => {
+    setRetryCount(0); // Reset retry count on manual refresh
     fetchLeaderboards(true);
   };
 
@@ -106,25 +129,28 @@ const Leaderboard = () => {
     );
   }
 
-  // Determine which leaderboard to show based on the current route
-  const isWeeklyRoute = location.pathname === '/weekly';
-  const currentLeaderboard = isWeeklyRoute ? weeklyLeaderboard : normalLeaderboard;
-  const title = isWeeklyRoute ? `Weekly Contest Leaderboard ${weeklyTitle ? `- ${weeklyTitle}` : ''} ${weeklyTime ? `(${weeklyTime})` : ''}` : 'Global Rankings';
+  const currentLeaderboard = activeView === 'weekly' ? weeklyLeaderboard : normalLeaderboard;
 
   return (
     <div className="leaderboards-container">
       <div className="content">
-        <div className="leaderboard-header">
-          <h2>{title}</h2>
+        <h1 className="leaderboard-title">Leaderboard</h1>
+        
+        <div className="toggle-container">
           <button 
-            className={`refresh-button ${refreshing ? 'refreshing' : ''}`} 
-            onClick={handleRefresh}
-            disabled={refreshing}
+            className={`toggle-button ${activeView === 'all-time' ? 'active' : ''}`}
+            onClick={() => setActiveView('all-time')}
           >
-            {refreshing ? 'Refreshing...' : 'Refresh'}
+            All-Time
+          </button>
+          <button 
+            className={`toggle-button ${activeView === 'weekly' ? 'active' : ''}`}
+            onClick={() => setActiveView('weekly')}
+          >
+            Weekly
           </button>
         </div>
-        
+
         {refreshing && (
           <div className="refresh-indicator">
             <div className="refresh-spinner"></div>
@@ -143,32 +169,34 @@ const Leaderboard = () => {
                   <th>Username</th>
                   <th>USN</th>
                   <th>Rating</th>
-                  {isWeeklyRoute && <th>Trend</th>}
+                  {activeView === 'weekly' && <th>Trend</th>}
                 </tr>
               </thead>
               <tbody>
                 {currentLeaderboard.map((user, index) => (
-                  <tr key={`${isWeeklyRoute ? 'weekly' : 'normal'}-${user.username}`}>
+                  <tr key={`${activeView}-${user.username}`}>
                     <td>{index + 1}</td>
                     <td>{user.rank}</td>
                     <td>{user.name}</td>
                     <td>{user.username}</td>
                     <td>{user.usn}</td>
                     <td>{user.rating}</td>
-                    {isWeeklyRoute && <td>{user.trend}</td>}
+                    {activeView === 'weekly' && <td>{user.trend}</td>}
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
-            <p className="no-data-message">No {isWeeklyRoute ? 'weekly contest' : 'leaderboard'} data available</p>
+            <p className="no-data-message">No {activeView === 'weekly' ? 'weekly contest' : 'leaderboard'} data available</p>
           )}
         </div>
         
         {error && (
           <div className="error-message">
             <p>{error}</p>
-            <button onClick={handleRefresh}>Try Again</button>
+            <button onClick={handleRefresh} disabled={refreshing}>
+              {refreshing ? 'Retrying...' : 'Try Again'}
+            </button>
           </div>
         )}
       </div>

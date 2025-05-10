@@ -9,13 +9,10 @@ const Header = () => {
     <header className="header">
       <h1 onClick={() => window.location.href='/'}>LeetLords</h1>
       <nav>
-        <Link to="/global" className={location.pathname === '/global' ? 'active' : ''}>
-          Global Rankings
+        <Link to="/leaderboard" className={location.pathname === '/leaderboard' ? 'active' : ''}>
+          Leaderboard
         </Link>
-        <Link to="/weekly" className={location.pathname === '/weekly' ? 'active' : ''}>
-          Weekly Contest
-        </Link>
-        <Link to="/user" className={location.pathname === '/user' ? 'active' : ''}>
+        <Link to="/userinfo" className={location.pathname === '/userinfo' ? 'active' : ''}>
           User Info
         </Link>
         <Link to="/about" className={location.pathname === '/about' ? 'active' : ''}>

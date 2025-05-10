@@ -461,13 +461,15 @@ tr:hover {
 }
 
 .refresh-button:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-.refresh-button.refreshing {
-  background: #3c3e4b;
-  position: relative;
+.last-updated {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 15px;
+  text-align: right;
 }
 
 @keyframes fadeIn {

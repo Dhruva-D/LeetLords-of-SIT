@@ -3,12 +3,10 @@ import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './Leaderboard.css';
 
-// Create a cache object to store API responses
-const apiCache = {
-  data: null,
-  timestamp: null,
-  CACHE_DURATION: 5 * 60 * 1000 // 5 minutes in milliseconds
-};
+// Cache constants
+const CACHE_KEY = 'leaderboardData';
+const CACHE_TIMESTAMP_KEY = 'leaderboardTimestamp';
+const CACHE_DURATION = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
 
 const MAX_RETRIES = 2;
 const INITIAL_TIMEOUT = 15000; // 15 seconds
@@ -25,8 +23,49 @@ const Leaderboard = () => {
   const [retryCount, setRetryCount] = useState(0);
   const location = useLocation();
   const [activeView, setActiveView] = useState('all-time'); // 'all-time' or 'weekly'
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // Load data from localStorage
+  const loadCachedData = useCallback(() => {
+    try {
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+      
+      if (cachedData && cachedTimestamp) {
+        const parsedData = JSON.parse(cachedData);
+        const timestamp = parseInt(cachedTimestamp, 10);
+        setLastUpdated(new Date(timestamp));
+        return { data: parsedData, timestamp };
+      }
+    } catch (err) {
+      console.error('Error loading cached data:', err);
+    }
+    return null;
+  }, []);
+
+  // Save data to localStorage
+  const saveDataToCache = useCallback((data) => {
+    try {
+      const now = new Date().getTime();
+      localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+      localStorage.setItem(CACHE_TIMESTAMP_KEY, now.toString());
+      setLastUpdated(new Date(now));
+    } catch (err) {
+      console.error('Error saving data to cache:', err);
+    }
+  }, []);
+
+  // Check if cache is expired
+  const isCacheExpired = useCallback(() => {
+    const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+    if (!cachedTimestamp) return true;
+    
+    const now = new Date().getTime();
+    const timestamp = parseInt(cachedTimestamp, 10);
+    return now - timestamp > CACHE_DURATION;
+  }, []);
 
   const fetchLeaderboards = useCallback(async (forceRefresh = false, currentRetry = 0) => {
     try {
@@ -36,17 +75,22 @@ const Leaderboard = () => {
         setLoading(true);
       }
 
-      // Check cache first
-      const now = new Date().getTime();
-      if (!forceRefresh && 
-          apiCache.data && 
-          apiCache.timestamp && 
-          (now - apiCache.timestamp < apiCache.CACHE_DURATION)) {
-        console.log('Using cached leaderboard data');
-        processLeaderboardData(apiCache.data);
-        setLoading(false);
-        setRefreshing(false);
-        return;
+      // Check cache first (unless force refresh)
+      if (!forceRefresh) {
+        const cachedData = loadCachedData();
+        if (cachedData && cachedData.data) {
+          console.log('Using cached leaderboard data');
+          processLeaderboardData(cachedData.data);
+          setLoading(false);
+          setRefreshing(false);
+          
+          // If cache is expired, trigger a background refresh
+          if (isCacheExpired()) {
+            console.log('Cache expired, fetching fresh data in background');
+            fetchLeaderboards(true, 0);
+          }
+          return;
+        }
       }
 
       // Fetch fresh data from API with increased timeout
@@ -55,9 +99,8 @@ const Leaderboard = () => {
         timeout: INITIAL_TIMEOUT + (currentRetry * 5000) // Increase timeout with each retry
       });
       
-      // Update the cache
-      apiCache.data = response.data;
-      apiCache.timestamp = now;
+      // Save to localStorage cache
+      saveDataToCache(response.data);
       
       // Process the data
       processLeaderboardData(response.data);
@@ -86,7 +129,7 @@ const Leaderboard = () => {
       setRefreshing(false);
       setRetryCount(currentRetry + 1);
     }
-  }, []);
+  }, [loadCachedData, saveDataToCache, isCacheExpired]);
 
   const processLeaderboardData = (data) => {
     // Process normal leaderboard data
@@ -109,15 +152,50 @@ const Leaderboard = () => {
     }
   };
 
-  // Initial fetch on component mount
+  // Set up auto-refresh timer
   useEffect(() => {
-    fetchLeaderboards();
-  }, [fetchLeaderboards]);
+    // Check for expired cache and refresh if needed on component mount
+    const checkAndRefreshCache = () => {
+      if (isCacheExpired()) {
+        console.log('Cache expired, fetching fresh data');
+        fetchLeaderboards(true);
+      }
+    };
+
+    // Set up interval to check cache every hour
+    const intervalId = setInterval(checkAndRefreshCache, 60 * 60 * 1000); // Check every hour
+    
+    return () => clearInterval(intervalId);
+  }, [fetchLeaderboards, isCacheExpired]);
+
+  // Initial load from cache on component mount
+  useEffect(() => {
+    const cachedData = loadCachedData();
+    
+    if (cachedData && cachedData.data) {
+      processLeaderboardData(cachedData.data);
+      setLoading(false);
+      
+      // If cache is expired, fetch in background
+      if (isCacheExpired()) {
+        fetchLeaderboards(true);
+      }
+    } else {
+      // No cache available, fetch new data
+      fetchLeaderboards(false);
+    }
+  }, [fetchLeaderboards, loadCachedData, isCacheExpired]);
 
   // Handle refresh button click
   const handleRefresh = () => {
     setRetryCount(0); // Reset retry count on manual refresh
     fetchLeaderboards(true);
+  };
+
+  // Format the last updated time
+  const formatLastUpdated = () => {
+    if (!lastUpdated) return '';
+    return lastUpdated.toLocaleString();
   };
 
   if (loading) {
@@ -134,7 +212,22 @@ const Leaderboard = () => {
   return (
     <div className="leaderboards-container">
       <div className="content">
-        <h1 className="leaderboard-title">Leaderboard</h1>
+        <div className="leaderboard-header">
+          <h1 className="leaderboard-title">Leaderboard</h1>
+          <button 
+            className="refresh-button" 
+            onClick={handleRefresh} 
+            disabled={refreshing}
+          >
+            {refreshing ? 'Refreshing...' : 'Refresh'}
+          </button>
+        </div>
+        
+        {lastUpdated && (
+          <div className="last-updated">
+            Last updated: {formatLastUpdated()}
+          </div>
+        )}
         
         <div className="toggle-container">
           <button 

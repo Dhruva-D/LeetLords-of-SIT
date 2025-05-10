@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
 import TopThreeLeaders from './TopThreeLeaders';
 import './Leaderboard.css';
+import config from '../config';
+import api from '../services/api';
 
-// Cache constants
+// Cache constants - using config values
 const CACHE_KEY = 'leaderboardData';
 const CACHE_TIMESTAMP_KEY = 'leaderboardTimestamp';
-const CACHE_DURATION = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+const CACHE_DURATION = config.cacheDuration;
 
 const MAX_RETRIES = 2;
-const INITIAL_TIMEOUT = 15000; // 15 seconds
+const INITIAL_TIMEOUT = config.apiTimeout; 
 const RETRY_DELAY = 1000; // 1 second delay between retries
 
 const Leaderboard = () => {
@@ -30,6 +31,8 @@ const Leaderboard = () => {
 
   // Load data from localStorage
   const loadCachedData = useCallback(() => {
+    if (!config.cacheEnabled) return null;
+
     try {
       const cachedData = localStorage.getItem(CACHE_KEY);
       const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
@@ -48,6 +51,8 @@ const Leaderboard = () => {
 
   // Save data to localStorage
   const saveDataToCache = useCallback((data) => {
+    if (!config.cacheEnabled) return;
+
     try {
       const now = new Date().getTime();
       localStorage.setItem(CACHE_KEY, JSON.stringify(data));
@@ -60,6 +65,8 @@ const Leaderboard = () => {
 
   // Check if cache is expired
   const isCacheExpired = useCallback(() => {
+    if (!config.cacheEnabled) return true;
+    
     const cachedTimestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
     if (!cachedTimestamp) return true;
     
@@ -96,7 +103,9 @@ const Leaderboard = () => {
 
       // Fetch fresh data from API with increased timeout
       console.log(`Fetching fresh leaderboard data (attempt ${currentRetry + 1}/${MAX_RETRIES + 1})`);
-      const response = await axios.get('/api/leaderboard', {
+      
+      // Use the centralized API service
+      const response = await api.get('/api/leaderboard', {
         timeout: INITIAL_TIMEOUT + (currentRetry * 5000) // Increase timeout with each retry
       });
       
@@ -256,6 +265,13 @@ const Leaderboard = () => {
           </button>
         </div>
         
+        {/* Environment indicator - visible only in development */}
+        {process.env.NODE_ENV !== 'production' && (
+          <div className="environment-indicator">
+            Environment: {process.env.NODE_ENV} | API: {config.apiBaseUrl}
+          </div>
+        )}
+
         <div className="toggle-container">
           <button 
             className={`toggle-button ${activeView === 'all-time' ? 'active' : ''}`}

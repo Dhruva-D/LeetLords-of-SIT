@@ -654,4 +654,18 @@ td {
     height: 20px;
     font-size: 0.7rem;
   }
+}
+
+.environment-indicator {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  background-color: rgba(139, 92, 246, 0.8);
+  color: white;
+  font-size: 0.7rem;
+  border-radius: 4px;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
 } 

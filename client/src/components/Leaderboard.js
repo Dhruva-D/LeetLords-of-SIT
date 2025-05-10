@@ -195,7 +195,30 @@ const Leaderboard = () => {
   // Format the last updated time
   const formatLastUpdated = () => {
     if (!lastUpdated) return '';
-    return lastUpdated.toLocaleString();
+    
+    const day = lastUpdated.getDate();
+    const month = lastUpdated.toLocaleString('default', { month: 'long' });
+    const year = lastUpdated.getFullYear();
+    const hours = lastUpdated.getHours();
+    const minutes = lastUpdated.getMinutes();
+    
+    // Add ordinal suffix to day
+    const getOrdinalSuffix = (day) => {
+      if (day > 3 && day < 21) return 'th';
+      switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    };
+    
+    const ordinalDay = `${day}${getOrdinalSuffix(day)}`;
+    const formattedHours = hours % 12 || 12;
+    const amPm = hours >= 12 ? 'PM' : 'AM';
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    
+    return `${ordinalDay} ${month} ${year}, ${formattedHours}:${formattedMinutes} ${amPm}`;
   };
 
   if (loading) {
@@ -223,11 +246,7 @@ const Leaderboard = () => {
           </button>
         </div>
         
-        {lastUpdated && (
-          <div className="last-updated">
-            Last updated: {formatLastUpdated()}
-          </div>
-        )}
+        
         
         <div className="toggle-container">
           <button 
@@ -283,6 +302,12 @@ const Leaderboard = () => {
             <p className="no-data-message">No {activeView === 'weekly' ? 'weekly contest' : 'leaderboard'} data available</p>
           )}
         </div>
+
+        {lastUpdated && (
+          <div className="last-updated">
+            Last updated: {formatLastUpdated()}
+          </div>
+        )}
         
         {error && (
           <div className="error-message">

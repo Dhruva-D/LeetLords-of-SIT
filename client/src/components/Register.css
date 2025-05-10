@@ -8,17 +8,17 @@
 
 .form-container {
   padding: 30px;
-  background: linear-gradient(145deg, #2c2c3d, #1e1e2d);
-  border-radius: 16px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 5px 15px rgba(0, 0, 0, 0.4);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   width: 100%;
-  border: 1px solid rgba(106, 111, 247, 0.2);
+  border: 1px solid var(--color-border);
   backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
+  transition: var(--transition-normal);
 }
 
 .form-container:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 8px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 40px rgba(123, 97, 255, 0.15), 0 8px 20px rgba(123, 97, 255, 0.1);
   transform: translateY(-5px);
 }
 
@@ -26,34 +26,46 @@
   text-align: center;
   margin-bottom: 25px;
   font-size: 2rem;
-  color: #ffffff;
-  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  color: var(--color-accent-primary);
   font-weight: 600;
   letter-spacing: 0.5px;
+  position: relative;
+}
+
+.form-container h2:after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: 3px;
 }
 
 .input-field {
   width: 100%;
   padding: 14px;
   margin: 12px 0;
-  border: 1px solid #444;
-  background-color: rgba(51, 51, 51, 0.7);
-  color: #fff;
-  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-md);
   font-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: var(--transition-normal);
+  box-shadow: var(--shadow-inner);
 }
 
 .input-field:focus {
-  border-color: #6a6ff7;
-  box-shadow: 0 0 0 2px rgba(106, 111, 247, 0.3), inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.2);
   outline: none;
 }
 
 .error-input {
   border-color: #f44336;
-  box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.3), inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.3);
 }
 
 .usn-input-container {
@@ -67,7 +79,7 @@
   margin-top: 5px;
   padding: 5px 10px;
   background-color: rgba(244, 67, 54, 0.1);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   border-left: 3px solid #f44336;
 }
 
@@ -75,30 +87,30 @@
   width: 100%;
   padding: 14px;
   margin: 24px 0 10px;
-  background: linear-gradient(135deg, #7a7fff, #5a5ad9);
+  background: var(--gradient-secondary);
   border: none;
   color: #fff;
   font-size: 1.1rem;
   font-weight: bold;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(106, 111, 247, 0.5);
+  transition: var(--transition-normal);
+  box-shadow: 0 4px 12px rgba(123, 97, 255, 0.3);
   letter-spacing: 0.5px;
 }
 
 .form-container button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #6a6ff7, #4e4ecf);
-  box-shadow: 0 6px 15px rgba(106, 111, 247, 0.6);
+  box-shadow: 0 6px 15px rgba(123, 97, 255, 0.4);
+  transform: translateY(-2px);
 }
 
 .form-container button:active:not(:disabled) {
-  transform: translateY(2px);
-  box-shadow: 0 2px 8px rgba(106, 111, 247, 0.4);
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(123, 97, 255, 0.2);
 }
 
 .form-container button:disabled {
-  background: linear-gradient(135deg, #4a4a65, #3a3a55);
+  background: linear-gradient(135deg, #C4B5FD, #DDD6FE);
   cursor: not-allowed;
   opacity: 0.7;
   box-shadow: none;
@@ -108,10 +120,10 @@
 .message {
   padding: 15px;
   margin-top: 20px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 1rem;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .message.success {

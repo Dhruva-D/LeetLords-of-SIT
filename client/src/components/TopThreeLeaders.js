@@ -10,9 +10,16 @@ const TopThreeLeaders = ({ leaders }) => {
   // Get the top 3 leaders
   const topThree = leaders.slice(0, 3);
 
-  // Crown icon using emoji or SVG
+  // Medal icons
+  const medalIcons = {
+    1: <span className="medal gold-medal">🥇</span>,
+    2: <span className="medal silver-medal">🥈</span>,
+    3: <span className="medal bronze-medal">🥉</span>
+  };
+
+  // Crown icon using SVG
   const crownIcon = (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="crown-svg">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="crown-svg">
       <path d="M3 17L6 7L12 12L18 7L21 17H3Z" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       <path d="M3 21H21V19H3V21Z" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
@@ -35,7 +42,7 @@ const TopThreeLeaders = ({ leaders }) => {
     return (
       <div className={`podium-position ${positionClasses[position]}`}>
         <div className="player-card">
-          {position === 1 && <div className="crown">{crownIcon}</div>}
+          {position <= 3 && <div className={`crown ${position === 1 ? 'animated-crown' : ''}`}>{crownIcon}</div>}
           <div className="avatar">
             <span>{getInitials(leader.name)}</span>
           </div>
@@ -44,7 +51,9 @@ const TopThreeLeaders = ({ leaders }) => {
             <p className="player-username">@{leader.username}</p>
             <div className="player-rating">{leader.rating}</div>
           </div>
-          <div className="position-badge">{position}</div>
+          <div className="medal-container">
+            {medalIcons[position]}
+          </div>
         </div>
         <div className="podium-block"></div>
       </div>

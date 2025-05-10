@@ -8,11 +8,12 @@
 
 .about-container .content {
   padding: 40px;
-  background: #252533;
-  border-radius: 16px;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   width: 100%;
   animation: fadeIn 0.6s ease-out;
+  border: 1px solid var(--color-border);
 }
 
 .about-container h2 {
@@ -20,10 +21,20 @@
   margin-bottom: 40px;
   font-size: 2.5rem;
   font-weight: 700;
-  color: #ffffff;
-  background: linear-gradient(90deg, #6a6ff7, #a78bfa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-accent-primary);
+  position: relative;
+}
+
+.about-container h2:after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: 3px;
 }
 
 .about-sections {
@@ -34,20 +45,21 @@
 
 .about-section {
   padding: 25px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   animation: slideUp 0.6s ease-out forwards;
   opacity: 0;
+  box-shadow: var(--shadow-sm);
 }
 
 .about-section:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(106, 111, 247, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .about-section h3 {
-  color: #6a6ff7;
+  color: var(--color-accent-primary);
   font-size: 1.4rem;
   margin-bottom: 15px;
   font-weight: 600;
@@ -56,7 +68,7 @@
 .about-section p {
   font-size: 1.1rem;
   line-height: 1.6;
-  color: #e4e6eb;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -67,7 +79,7 @@
 }
 
 .about-section ul li {
-  color: #e4e6eb;
+  color: var(--color-text-primary);
   font-size: 1.1rem;
   line-height: 1.8;
   padding-left: 25px;
@@ -78,7 +90,7 @@
   content: "→";
   position: absolute;
   left: 0;
-  color: #6a6ff7;
+  color: var(--color-accent-primary);
 }
 
 @keyframes fadeIn {

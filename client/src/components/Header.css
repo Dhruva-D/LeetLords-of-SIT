@@ -1,5 +1,5 @@
 .header {
-  background-color: #252533;
+  background-color: var(--color-bg-secondary);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -7,19 +7,25 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .header h1 {
-  color: #ffffff;
+  color: var(--color-accent-primary);
   font-size: 1.8rem;
   font-weight: 700;
   margin: 0;
-  background: linear-gradient(90deg, #6a6ff7, #a78bfa);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   cursor: pointer;
   white-space: nowrap;
+  transition: transform 0.3s ease;
+}
+
+.header h1:hover {
+  transform: translateY(-2px);
 }
 
 .header nav {
@@ -29,23 +35,48 @@
 }
 
 .header nav a {
-  color: #b0b3c8;
+  color: var(--color-text-secondary);
   text-decoration: none;
   font-size: 1rem;
   font-weight: 500;
   padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
+  border-radius: var(--radius-md);
+  transition: var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.header nav a:before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--gradient-primary);
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.header nav a:hover:before {
+  width: 100%;
+  left: 0;
 }
 
 .header nav a:hover {
-  color: #6a6ff7;
-  background-color: rgba(106, 111, 247, 0.1);
+  color: var(--color-accent-primary);
+  background-color: rgba(123, 97, 255, 0.05);
+  transform: translateY(-2px);
 }
 
 .header nav a.active {
-  color: #ffffff;
-  background-color: #3c3e4b;
+  color: var(--color-accent-primary);
+  background-color: rgba(123, 97, 255, 0.1);
+  font-weight: 600;
+}
+
+.header nav a.active:before {
+  width: 100%;
+  left: 0;
 }
 
 /* Debug alert styles */
@@ -65,7 +96,7 @@
   position: absolute;
   top: 100%;
   left: 0;
-  border-radius: 0 0 0.5rem 0.5rem;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
 }
 
 @keyframes pulse {

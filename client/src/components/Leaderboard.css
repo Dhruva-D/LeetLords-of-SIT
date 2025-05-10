@@ -2,19 +2,29 @@
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #F5F0FF;
+  background-color: #F9F7FF;
   min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .content {
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
   padding: 2rem;
-  box-shadow: 8px 8px 16px #C4AEE8, -8px -8px 16px #FFFFFF;
+  box-shadow: 
+    8px 8px 16px #C4AEE8, 
+    -8px -8px 16px #FFFFFF,
+    0 10px 30px rgba(124, 58, 237, 0.15),
+    0 20px 40px rgba(124, 58, 237, 0.1);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(215, 180, 254, 0.5);
   position: relative;
   overflow: hidden;
+  transform-style: preserve-3d;
+  perspective: 1000px;
 }
 
 .content::before {
@@ -40,7 +50,9 @@
   color: #6D28D9;
   margin-bottom: 2rem;
   text-align: center;
-  text-shadow: 1px 1px 2px rgba(109, 40, 217, 0.2);
+  text-shadow: 2px 2px 4px rgba(109, 40, 217, 0.15);
+  position: relative;
+  z-index: 2;
 }
 
 .toggle-container {
@@ -54,7 +66,12 @@
   width: fit-content;
   margin-left: auto;
   margin-right: auto;
-  box-shadow: inset 2px 2px 5px rgba(166, 135, 235, 0.2), inset -2px -2px 5px rgba(255, 255, 255, 0.7);
+  box-shadow: 
+    inset 2px 2px 5px rgba(166, 135, 235, 0.2), 
+    inset -2px -2px 5px rgba(255, 255, 255, 0.7),
+    0 5px 15px rgba(124, 58, 237, 0.1);
+  position: relative;
+  z-index: 2;
 }
 
 .toggle-button {
@@ -72,8 +89,10 @@
 .toggle-button.active {
   background: linear-gradient(135deg, #8B5CF6, #7C3AED);
   color: white;
-  box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
-  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 10px rgba(124, 58, 237, 0.3),
+    0 2px 5px rgba(109, 40, 217, 0.2);
+  transform: translateY(-2px) translateZ(5px);
 }
 
 .toggle-button:hover:not(.active) {
@@ -81,14 +100,32 @@
   transform: translateY(-1px);
 }
 
+.leaderboard-row {
+  transition: all 0.3s ease;
+  animation: fadeIn 0.5s ease-out forwards;
+  animation-delay: calc(var(--row-index, 0) * 50ms);
+  opacity: 0;
+}
+
+tr:hover {
+  background: #F5F3FF;
+  transform: translateZ(5px);
+  box-shadow: 0 2px 5px rgba(124, 58, 237, 0.1);
+}
+
 .table-container {
   overflow-x: auto;
   margin-top: 2rem;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
+  box-shadow: 
+    0 4px 12px rgba(124, 58, 237, 0.1),
+    0 8px 16px rgba(124, 58, 237, 0.05),
+    0 2px 4px rgba(215, 180, 254, 0.2);
   border: 1px solid rgba(215, 180, 254, 0.3);
   transition: all 0.3s ease;
+  transform: translateZ(10px);
+  animation: pulseGlow 3s infinite;
 }
 
 table {
@@ -110,10 +147,7 @@ td {
   padding: 1rem;
   border-bottom: 1px solid #EDE9FE;
   color: #4B5563;
-}
-
-tr:hover {
-  background: #F5F3FF;
+  transition: all 0.2s ease;
 }
 
 .loading-container {
@@ -145,6 +179,7 @@ tr:hover {
   background: #EDE9FE;
   padding: 0.75rem;
   border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(124, 58, 237, 0.1);
 }
 
 .refresh-spinner {
@@ -233,13 +268,19 @@ tr:hover {
   align-items: center;
   gap: 8px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(124, 58, 237, 0.2);
+  box-shadow: 
+    0 4px 6px rgba(124, 58, 237, 0.2),
+    0 2px 4px rgba(124, 58, 237, 0.1);
+  position: relative;
+  z-index: 2;
 }
 
 .refresh-button:hover:not(:disabled) {
   background: linear-gradient(135deg, #7C3AED, #6D28D9);
   transform: translateY(-2px);
-  box-shadow: 0 6px 10px rgba(124, 58, 237, 0.3);
+  box-shadow: 
+    0 6px 10px rgba(124, 58, 237, 0.3),
+    0 3px 6px rgba(124, 58, 237, 0.2);
 }
 
 .refresh-button:disabled {
@@ -376,7 +417,7 @@ tr:hover {
   }
 
   .toggle-button {
-    padding: 0.5rem 1.5rem;
+    padding: 0.6rem 1.5rem;
     font-size: 0.9rem;
   }
 
@@ -567,4 +608,50 @@ tr:hover {
   color: #10B981;
   overflow-x: auto;
   border: 1px solid #DDD6FE;
+}
+
+/* Additional animations */
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.2); }
+  50% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
+}
+
+/* Modern icons for ranks 4+ */
+.rank-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+  border-radius: 50%;
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-right: 8px;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+  .content {
+    padding: 1.5rem;
+  }
+
+  .toggle-button {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  table th,
+  table td {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .rank-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
 } 

@@ -233,6 +233,15 @@ const Leaderboard = () => {
 
   const currentLeaderboard = activeView === 'weekly' ? weeklyLeaderboard : normalLeaderboard;
 
+  const renderRankIcon = (rank) => {
+    if (rank <= 3) {
+      return null; // Top 3 ranks are displayed with medals in the podium
+    }
+    return (
+      <span className="rank-icon">{rank}</span>
+    );
+  };
+
   return (
     <div className="leaderboards-container">
       <div className="content">
@@ -246,8 +255,6 @@ const Leaderboard = () => {
             {refreshing ? 'Refreshing...' : 'Refresh'}
           </button>
         </div>
-        
-        
         
         <div className="toggle-container">
           <button 
@@ -289,12 +296,19 @@ const Leaderboard = () => {
               </thead>
               <tbody>
                 {currentLeaderboard.map((user, index) => (
-                  <tr key={`${activeView}-${user.username}`}>
-                    <td>{index + 1}</td>
+                  <tr 
+                    key={`${activeView}-${user.username}`} 
+                    className="leaderboard-row"
+                    style={{"--row-index": index}}
+                  >
+                    <td>
+                      {index >= 3 && renderRankIcon(index + 1)}
+                      {index + 1}
+                    </td>
                     <td>{user.rank}</td>
                     <td>{user.name}</td>
                     <td>{user.username}</td>
-                    <td>{user.usn || '-'}</td>
+                    <td>{user.usn}</td>
                     <td>{user.rating}</td>
                     {activeView === 'weekly' && <td>{user.trend}</td>}
                   </tr>
@@ -305,8 +319,6 @@ const Leaderboard = () => {
             <p className="no-data-message">No {activeView === 'weekly' ? 'weekly contest' : 'leaderboard'} data available</p>
           )}
         </div>
-
-
         
         {lastUpdated && (
           <div className="last-updated">

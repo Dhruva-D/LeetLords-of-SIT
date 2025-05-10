@@ -179,7 +179,7 @@ const Leaderboard = () => {
                     <td>{user.rank}</td>
                     <td>{user.name}</td>
                     <td>{user.username}</td>
-                    <td>{user.usn}</td>
+                    <td>{user.usn || '-'}</td>
                     <td>{user.rating}</td>
                     {activeView === 'weekly' && <td>{user.trend}</td>}
                   </tr>

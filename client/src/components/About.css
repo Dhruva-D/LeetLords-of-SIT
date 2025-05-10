@@ -2,7 +2,8 @@
   display: flex;
   justify-content: center;
   margin: 40px auto;
-  max-width: 900px;
+  max-width: 1000px;
+  padding: 0 20px;
 }
 
 .about-container .content {
@@ -11,29 +12,123 @@
   border-radius: 16px;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
   width: 100%;
+  animation: fadeIn 0.6s ease-out;
 }
 
 .about-container h2 {
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 2rem;
-  font-weight: 600;
+  margin-bottom: 40px;
+  font-size: 2.5rem;
+  font-weight: 700;
   color: #ffffff;
+  background: linear-gradient(90deg, #6a6ff7, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.about-container p {
+.about-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.about-section {
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: slideUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.about-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(106, 111, 247, 0.1);
+}
+
+.about-section h3 {
+  color: #6a6ff7;
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.about-section p {
   font-size: 1.1rem;
   line-height: 1.6;
-  text-align: center;
   color: #e4e6eb;
+  margin: 0;
 }
+
+.about-section ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.about-section ul li {
+  color: #e4e6eb;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  padding-left: 25px;
+  position: relative;
+}
+
+.about-section ul li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #6a6ff7;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.about-section:nth-child(1) { animation-delay: 0.1s; }
+.about-section:nth-child(2) { animation-delay: 0.2s; }
+.about-section:nth-child(3) { animation-delay: 0.3s; }
+.about-section:nth-child(4) { animation-delay: 0.4s; }
 
 @media (max-width: 768px) {
   .about-container .content {
+    padding: 25px;
+  }
+
+  .about-container h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+
+  .about-sections {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .about-section {
     padding: 20px;
   }
-  
-  .about-container p {
+
+  .about-section h3 {
+    font-size: 1.2rem;
+  }
+
+  .about-section p,
+  .about-section ul li {
     font-size: 1rem;
   }
 }

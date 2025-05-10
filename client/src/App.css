@@ -3,4 +3,11 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #1e1e2f;
+}
+
+/* Ensure content has proper spacing below fixed header */
+.App > *:not(header) {
+  margin-top: 20px;
+  flex: 1;
 } 

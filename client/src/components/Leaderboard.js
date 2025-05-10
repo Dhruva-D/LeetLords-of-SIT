@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import TopThreeLeaders from './TopThreeLeaders';
 import './Leaderboard.css';
 
 // Cache constants
@@ -246,7 +247,11 @@ const Leaderboard = () => {
           </button>
         </div>
         
-        
+        {lastUpdated && (
+          <div className="last-updated">
+            Last updated: {formatLastUpdated()}
+          </div>
+        )}
         
         <div className="toggle-container">
           <button 
@@ -269,6 +274,8 @@ const Leaderboard = () => {
             <span>Updating data...</span>
           </div>
         )}
+
+        <TopThreeLeaders leaders={currentLeaderboard} />
         
         <div className="table-container">
           {currentLeaderboard.length > 0 ? (
@@ -302,12 +309,6 @@ const Leaderboard = () => {
             <p className="no-data-message">No {activeView === 'weekly' ? 'weekly contest' : 'leaderboard'} data available</p>
           )}
         </div>
-
-        {lastUpdated && (
-          <div className="last-updated">
-            Last updated: {formatLastUpdated()}
-          </div>
-        )}
         
         {error && (
           <div className="error-message">

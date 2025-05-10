@@ -1,88 +1,67 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import './TopThreeLeaders.css';
 
 const TopThreeLeaders = ({ leaders }) => {
-  // Animation variants for the container
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.3
-      }
-    }
-  };
-
-  // Animation variants for each leader card
-  const leaderVariants = {
-    hidden: { y: 50, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12
-      }
-    }
-  };
-
-  // Ensure we have exactly 3 leaders, pad with empty slots if needed
-  const topThree = leaders?.slice(0, 3) || [];
-  while (topThree.length < 3) {
-    topThree.push({ username: 'No Player', rating: 0 });
+  // If there are no leaders or less than 3, return null
+  if (!leaders || leaders.length < 3) {
+    return null;
   }
 
-  // Reorder for podium display: [2nd, 1st, 3rd]
-  const podiumOrder = [topThree[1], topThree[0], topThree[2]];
+  // Get the top 3 leaders
+  const topThree = leaders.slice(0, 3);
+
+  // Crown icon using emoji or SVG
+  const crownIcon = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="crown-svg">
+      <path d="M3 17L6 7L12 12L18 7L21 17H3Z" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M3 21H21V19H3V21Z" fill="#FFD700" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+
+  // Generate initials from name
+  const getInitials = (name) => {
+    if (!name) return '?';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  // Render a podium position
+  const PodiumPosition = ({ leader, position }) => {
+    const positionClasses = {
+      1: 'first-place',
+      2: 'second-place',
+      3: 'third-place'
+    };
+
+    return (
+      <div className={`podium-position ${positionClasses[position]}`}>
+        <div className="player-card">
+          {position === 1 && <div className="crown">{crownIcon}</div>}
+          <div className="avatar">
+            <span>{getInitials(leader.name)}</span>
+          </div>
+          <div className="player-info">
+            <h3 className="player-name">{leader.name}</h3>
+            <p className="player-username">@{leader.username}</p>
+            <div className="player-rating">{leader.rating}</div>
+          </div>
+          <div className="position-badge">{position}</div>
+        </div>
+        <div className="podium-block"></div>
+      </div>
+    );
+  };
 
   return (
-    <motion.div 
-      className="top-three-container"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {podiumOrder.map((leader, index) => {
-        const podiumPosition = index === 1 ? 1 : index === 0 ? 2 : 3;
-        const isWinner = podiumPosition === 1;
-        
-        return (
-          <motion.div
-            key={podiumPosition}
-            className={`leader-card position-${podiumPosition}`}
-            variants={leaderVariants}
-            whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-          >
-            <div className="leader-content">
-              {isWinner && (
-                <motion.div
-                  className="crown"
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  👑
-                </motion.div>
-              )}
-              <div className="avatar-container">
-                <div className="avatar">
-                  <span className="user-icon">👤</span>
-                </div>
-              </div>
-              <div className="user-details">
-                <span className="username">@{leader.username}</span>
-                <span className="score">{Math.round(leader.rating)}</span>
-              </div>
-            </div>
-            <div className={`podium podium-${podiumPosition}`}>
-              <span className="position">{podiumPosition}</span>
-            </div>
-          </motion.div>
-        );
-      })}
-      <div className="background-particles" />
-    </motion.div>
+    <div className="top-three-container">
+      <div className="animated-background">
+        <div className="particles"></div>
+      </div>
+      <div className="podium-wrapper">
+        <PodiumPosition leader={topThree[1]} position={2} />
+        <PodiumPosition leader={topThree[0]} position={1} />
+        <PodiumPosition leader={topThree[2]} position={3} />
+      </div>
+    </div>
   );
 };
 

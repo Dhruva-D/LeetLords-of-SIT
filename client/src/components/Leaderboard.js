@@ -247,11 +247,7 @@ const Leaderboard = () => {
           </button>
         </div>
         
-        {lastUpdated && (
-          <div className="last-updated">
-            Last updated: {formatLastUpdated()}
-          </div>
-        )}
+        
         
         <div className="toggle-container">
           <button 
@@ -309,6 +305,14 @@ const Leaderboard = () => {
             <p className="no-data-message">No {activeView === 'weekly' ? 'weekly contest' : 'leaderboard'} data available</p>
           )}
         </div>
+
+
+        
+        {lastUpdated && (
+          <div className="last-updated">
+            Last updated: {formatLastUpdated()}
+          </div>
+        )}
         
         {error && (
           <div className="error-message">

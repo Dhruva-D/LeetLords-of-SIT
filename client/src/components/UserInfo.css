@@ -183,4 +183,60 @@
   .stats-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.user-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.user-details .refresh-button {
+  background: #3c3e4b;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.user-details .refresh-button:hover:not(:disabled) {
+  background: #6a6ff7;
+  transform: translateY(-2px);
+}
+
+.user-details .refresh-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* API status indicator */
+.api-status {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.api-status.connected {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.api-status.error {
+  background: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+.api-status.unknown {
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
 } 

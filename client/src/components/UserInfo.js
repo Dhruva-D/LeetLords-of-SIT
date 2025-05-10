@@ -1,11 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import './UserInfo.css';
 
-// Create axios instance with explicit backend URL
+// Create a cache for user data
+const userCache = {
+  data: {},
+  timestamps: {},
+  CACHE_DURATION: 5 * 60 * 1000 // 5 minutes in milliseconds
+};
+
+// Create axios instance with explicit backend URL and timeout
 const api = axios.create({
   baseURL: 'http://localhost:5000',
-  timeout: 5000,
+  timeout: 8000, // 8 second timeout
   withCredentials: false
 });
 
@@ -37,26 +44,62 @@ const UserInfo = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!username.trim()) return;
+  const fetchUserData = useCallback(async (userToFetch, forceRefresh = false) => {
+    if (!userToFetch.trim()) return;
 
     setLoading(true);
     setError(null);
-    setUserInfo(null);
 
     try {
-      const response = await api.get(`/api/user/${username}`);
+      // Check if we have cached data for this user and it's still valid
+      const now = new Date().getTime();
+      if (!forceRefresh && 
+          userCache.data[userToFetch] && 
+          userCache.timestamps[userToFetch] && 
+          (now - userCache.timestamps[userToFetch] < userCache.CACHE_DURATION)) {
+        console.log(`Using cached data for user: ${userToFetch}`);
+        setUserInfo(userCache.data[userToFetch]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch fresh data
+      console.log(`Fetching fresh data for user: ${userToFetch}`);
+      const response = await api.get(`/api/user/${userToFetch}`);
+      
       const processedData = {
         ...response.data,
         rating: response.data.rating ? Number(response.data.rating).toFixed(2) : 'N/A',
         contestRating: response.data.contestRating ? Number(response.data.contestRating).toFixed(2) : 'N/A'
       };
+      
+      // Update the cache
+      userCache.data[userToFetch] = processedData;
+      userCache.timestamps[userToFetch] = now;
+      
       setUserInfo(processedData);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch user data');
+      setUserInfo(null);
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!username.trim()) return;
+    
+    // Reset previous user data
+    setUserInfo(null);
+    
+    // Fetch user data
+    await fetchUserData(username);
+  };
+
+  const handleRefresh = () => {
+    if (userInfo) {
+      fetchUserData(username, true);
     }
   };
 
@@ -97,7 +140,17 @@ const UserInfo = () => {
 
         {userInfo && (
           <div className="user-details">
-            <h3>Profile Details</h3>
+            <div className="user-details-header">
+              <h3>Profile Details</h3>
+              <button 
+                className="refresh-button" 
+                onClick={handleRefresh}
+                disabled={loading}
+              >
+                {loading ? 'Refreshing...' : 'Refresh'}
+              </button>
+            </div>
+            
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="stat-label">Global Rank</div>

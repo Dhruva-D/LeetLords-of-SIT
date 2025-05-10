@@ -32,38 +32,70 @@ async function testLeetCodeApi() {
 }
 
 /**
+ * Validate SIT USN format
+ * @param {string} usn - USN to validate
+ * @returns {boolean} - True if valid, false otherwise
+ */
+function isValidUSN(usn) {
+  if (!usn) return false;
+  
+  // Standardize input to uppercase
+  const usnUpper = usn.toUpperCase();
+  
+  // USN must start with 1SI or 4SI and be exactly 10 characters
+  const usnPattern = /^[14]SI\d{2}[A-Z]{2}\d{3}$/;
+  return usnPattern.test(usnUpper);
+}
+
+/**
  * Handle registering a new user
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
 async function handelAddNewUser(req, res) {
   try {
-    const { name, user } = req.body
+    const { name, user, usn } = req.body
 
     // Validate input
     if (!user) return res.status(400).json({ error: 'Enter Username' })
     if (!name) return res.status(400).json({ error: 'Enter Your Name' })
+    if (!usn) return res.status(400).json({ error: 'Enter Your SIT USN' })
 
-    // Check if username or name already exists
+    // Validate USN format
+    if (!isValidUSN(usn)) {
+      return res.status(400).json({ 
+        error: 'Invalid USN format. USN must start with 1SI or 4SI and follow the format like 1SI23CI013'
+      })
+    }
+
+    // Standardize USN to uppercase
+    const standardizedUSN = usn.toUpperCase();
+
+    // Check if username, name or USN already exists
     const existingUser = await User.findOne({ userId: user })
     const existingName = await User.findOne({ name })
+    const existingUSN = await User.findOne({ usn: standardizedUSN })
 
     if (existingUser) {
       return res.status(400).json({ error: `Username "${user}" already exists.` })
     } else if (existingName) {
       return res.status(400).json({ error: `Name "${name}" already exists.` })
+    } else if (existingUSN) {
+      return res.status(400).json({ error: `USN "${standardizedUSN}" already exists.` })
     }
 
     // Create new user
     const newUser = await User.create({
       userId: user,
       name,
+      usn: standardizedUSN,
     })
 
     return res.status(200).json({ 
       success: true, 
       name,
       user,
+      usn: standardizedUSN,
       id: newUser._id 
     })
   } catch (error) {

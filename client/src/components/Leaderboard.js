@@ -141,6 +141,7 @@ const Leaderboard = () => {
                   <th>Global Rank</th>
                   <th>Name</th>
                   <th>Username</th>
+                  <th>USN</th>
                   <th>Rating</th>
                   {isWeeklyRoute && <th>Trend</th>}
                 </tr>
@@ -152,6 +153,7 @@ const Leaderboard = () => {
                     <td>{user.rank}</td>
                     <td>{user.name}</td>
                     <td>{user.username}</td>
+                    <td>{user.usn}</td>
                     <td>{user.rating}</td>
                     {isWeeklyRoute && <td>{user.trend}</td>}
                   </tr>

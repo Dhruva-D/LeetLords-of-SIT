@@ -67,6 +67,7 @@ async function getUserContestData(user) {
     return {
       name: user.name,
       username: user.userId,
+      usn: user.usn,
       rating: contestHistory.userContestRanking?.rating || 0,
       rank: contestHistory.userContestRanking?.globalRanking || 0,
       attended: false,
@@ -92,6 +93,7 @@ async function getUserContestData(user) {
   return {
     name: user.name,
     username: user.userId,
+    usn: user.usn,
     rating: contestHistory.userContestRanking?.rating || 0,
     rank: contestHistory.userContestRanking?.globalRanking || 0,
     attended: attendedLatest,

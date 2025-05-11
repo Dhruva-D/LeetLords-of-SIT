@@ -117,31 +117,42 @@ async function handelGetUser(req, res) {
       return res.status(400).json({ error: 'Username parameter is required' })
     }
     
-    console.log(`Fetching contest data for username: ${username}`)
+    console.log(`Fetching data for username: ${username}`)
     
+    // Initialize response data
+    let responseData = {}
+    
+    // First, try to get basic user data
     try {
-      // Attempt to fetch contest data from LeetCode API
-      const contestData = await leetcode.user_contest_info(username)
-      
-      return res.status(200).json({
-        userContestDetails: contestData,
+      const userData = await leetcode.user(username)
+      responseData.userData = userData
+    } catch (userError) {
+      console.error(`Error fetching user data: ${userError.message}`)
+      return res.status(404).json({ 
+        message: 'User not found on LeetCode',
+        error: userError.message 
       })
-    } catch (leetcodeError) {
-      // Try alternative approach - get basic user info first
-      try {
-        const userData = await leetcode.user(username)
-        
-        return res.status(200).json({
-          userData,
-          message: 'Contest data unavailable, but user exists',
-        })
-      } catch (userError) {
-        return res.status(404).json({ 
-          message: 'User not found on LeetCode',
-          error: userError.message 
-        })
-      }
     }
+    
+    // If user data was found, try to get contest data
+    try {
+      const contestData = await leetcode.user_contest_info(username)
+      responseData.userContestDetails = contestData
+    } catch (contestError) {
+      console.error(`Error fetching contest data: ${contestError.message}`)
+      responseData.contestError = 'Contest data unavailable'
+    }
+    
+    // Try to get user's recent submissions
+    try {
+      const recentSubmissions = await leetcode.recent_submissions(username)
+      responseData.recentSubmissions = recentSubmissions
+    } catch (submissionsError) {
+      console.error(`Error fetching recent submissions: ${submissionsError.message}`)
+      responseData.submissionsError = 'Recent submissions data unavailable'
+    }
+    
+    return res.status(200).json(responseData)
   } catch (error) {
     console.error(`Error processing request:`, error)
     

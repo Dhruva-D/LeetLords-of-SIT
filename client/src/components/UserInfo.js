@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import axios from 'axios';
 import './UserInfo.css';
+import config from '../config';
 
 // Create axios instance with explicit backend URL and timeout
 const api = axios.create({
-  baseURL: 'http://localhost:5000',
-  timeout: 10000, // 10 second timeout
+  baseURL: config.apiBaseUrl,
+  timeout: config.apiTimeout, // Use configured timeout
   withCredentials: false
 });
 
@@ -28,13 +29,30 @@ const UserInfo = () => {
       // Process the data
       const userData = response.data.userData || {};
       const contestData = response.data.userContestDetails || {};
+      const recentSubmissions = response.data.recentSubmissions || [];
       
       // Calculate solved problems by difficulty
+      // First check if we have allQuestionsCount for total available problems
+      const allQuestions = userData.allQuestionsCount || [];
+      const totalAvailable = {
+        all: allQuestions.find(q => q.difficulty === "All")?.count || 0,
+        easy: allQuestions.find(q => q.difficulty === "Easy")?.count || 0,
+        medium: allQuestions.find(q => q.difficulty === "Medium")?.count || 0,
+        hard: allQuestions.find(q => q.difficulty === "Hard")?.count || 0
+      };
+      
+      // Then get the solved problems from submitStats
+      const submitStats = userData.matchedUser?.submitStats || {};
+      const acSubmissions = submitStats.acSubmissionNum || [];
+      const totalSubmissions = submitStats.totalSubmissionNum || [];
+      
       const problemStats = {
-        total: userData.submitStats?.acSubmissionNum?.[0]?.count || 0,
-        easy: userData.submitStats?.acSubmissionNum?.[1]?.count || 0,
-        medium: userData.submitStats?.acSubmissionNum?.[2]?.count || 0,
-        hard: userData.submitStats?.acSubmissionNum?.[3]?.count || 0
+        total: acSubmissions.find(s => s.difficulty === "All")?.count || 0,
+        easy: acSubmissions.find(s => s.difficulty === "Easy")?.count || 0,
+        medium: acSubmissions.find(s => s.difficulty === "Medium")?.count || 0,
+        hard: acSubmissions.find(s => s.difficulty === "Hard")?.count || 0,
+        totalAvailable: totalAvailable,
+        acceptanceRate: calculateAcceptanceRate(acSubmissions, totalSubmissions)
       };
       
       // Process contest history
@@ -44,7 +62,7 @@ const UserInfo = () => {
       const topPercentage = contestData.userContestRanking?.topPercentage?.toFixed(2) || 'N/A';
       
       // Get recent contests (last 5)
-      const recentContests = contestData.userContestRankingHistory?.slice(0, 5) || [];
+      const recentContests = contestData.userContestRankingHistory?.filter(contest => contest.attended)?.slice(0, 5) || [];
       
       // Calculate best rank
       let bestRank = Number.MAX_SAFE_INTEGER;
@@ -52,9 +70,9 @@ const UserInfo = () => {
       
       if (contestData.userContestRankingHistory) {
         contestData.userContestRankingHistory.forEach(contest => {
-          if (contest.ranking && contest.ranking < bestRank) {
+          if (contest.attended && contest.ranking && contest.ranking < bestRank) {
             bestRank = contest.ranking;
-            bestContestName = contest.contestName;
+            bestContestName = contest.contest?.title || '';
           }
         });
       }
@@ -68,6 +86,70 @@ const UserInfo = () => {
       
       let last30DaysActivity = 0;
       let last7DaysActivity = 0;
+      
+      // Process submission calendar if available
+      if (userData.matchedUser?.submissionCalendar) {
+        try {
+          const calendar = JSON.parse(userData.matchedUser.submissionCalendar);
+          const now = Date.now() / 1000; // Current time in seconds
+          
+          Object.entries(calendar).forEach(([timestamp, count]) => {
+            const submissionTime = parseInt(timestamp);
+            const secondsInDay = 86400; // 24 * 60 * 60
+            
+            // Check if submission is within last 30 days
+            if (now - submissionTime <= 30 * secondsInDay) {
+              last30DaysActivity += parseInt(count);
+              
+              // Check if submission is within last 7 days
+              if (now - submissionTime <= 7 * secondsInDay) {
+                last7DaysActivity += parseInt(count);
+              }
+            }
+          });
+        } catch (e) {
+          console.error("Error parsing submission calendar:", e);
+        }
+      } else {
+        // Fallback to processing recent submissions if calendar not available
+        if (recentSubmissions && recentSubmissions.length > 0) {
+          // Create a Set to track unique problem IDs solved in each time period
+          const last7DaysProblems = new Set();
+          const last30DaysProblems = new Set();
+          
+          recentSubmissions.forEach(submission => {
+            if (submission.statusDisplay === 'Accepted') {
+              const submissionDate = new Date(submission.timestamp * 1000);
+              const problemId = submission.titleSlug;
+              
+              if (submissionDate >= thirtyDaysAgo) {
+                last30DaysProblems.add(problemId);
+                
+                if (submissionDate >= sevenDaysAgo) {
+                  last7DaysProblems.add(problemId);
+                }
+              }
+            }
+          });
+          
+          last7DaysActivity = last7DaysProblems.size;
+          last30DaysActivity = last30DaysProblems.size;
+        }
+      }
+      
+      // Get profile details
+      const profile = userData.matchedUser?.profile || {};
+      const realName = profile.realName || userToFetch;
+      const profilePicture = profile.userAvatar || null;
+      const countryName = profile.countryName || null;
+      const skillTags = profile.skillTags || [];
+      const starRating = profile.starRating || 0;
+      const company = profile.company || null;
+      const school = profile.school || null;
+      
+      // Get badges
+      const badges = userData.matchedUser?.badges || [];
+      const activeBadge = userData.matchedUser?.activeBadge || null;
       
       // Calculate user tier based on rating
       let tier = 'Novice';
@@ -106,8 +188,13 @@ const UserInfo = () => {
       // Compile all the processed data
       const processedData = {
         username: userToFetch,
-        realName: userData.realName || userToFetch,
-        profilePicture: userData.userAvatar || null,
+        realName,
+        profilePicture,
+        countryName,
+        skillTags,
+        starRating,
+        company,
+        school,
         problemStats,
         contestHistory,
         contestRating,
@@ -118,6 +205,8 @@ const UserInfo = () => {
         bestContestName,
         last30DaysActivity,
         last7DaysActivity,
+        badges,
+        activeBadge,
         tier,
         tierColor,
         tierIcon
@@ -147,6 +236,18 @@ const UserInfo = () => {
   const calculatePercentage = (value, total) => {
     if (!total || total === 0) return 0;
     return Math.min(100, Math.round((value / total) * 100));
+  };
+
+  // Helper function to calculate acceptance rate
+  const calculateAcceptanceRate = (acSubmissions, totalSubmissions) => {
+    const acAll = acSubmissions.find(s => s.difficulty === "All");
+    const totalAll = totalSubmissions.find(s => s.difficulty === "All");
+    
+    if (acAll && totalAll && totalAll.submissions > 0) {
+      return ((acAll.submissions / totalAll.submissions) * 100).toFixed(1);
+    }
+    
+    return "0.0";
   };
 
   return (
@@ -202,8 +303,41 @@ const UserInfo = () => {
                   <span className="tier-icon">{userInfo.tierIcon}</span>
                   <span>{userInfo.tier}</span>
                 </div>
+                
+                {/* Additional user information */}
+                <div className="additional-info">
+                  {userInfo.countryName && (
+                    <div className="info-item">
+                      <span className="info-icon">🌍</span>
+                      <span>{userInfo.countryName}</span>
+                    </div>
+                  )}
+                  {userInfo.school && (
+                    <div className="info-item">
+                      <span className="info-icon">🎓</span>
+                      <span>{userInfo.school}</span>
+                    </div>
+                  )}
+                  {userInfo.company && (
+                    <div className="info-item">
+                      <span className="info-icon">💼</span>
+                      <span>{userInfo.company}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+            
+            {userInfo.skillTags && userInfo.skillTags.length > 0 && (
+              <div className="skills-container">
+                <div className="skills-title">Skills</div>
+                <div className="skills-tags">
+                  {userInfo.skillTags.map((skill, index) => (
+                    <div key={index} className="skill-tag">{skill}</div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="stats-grid">
@@ -245,6 +379,9 @@ const UserInfo = () => {
               <div className="total-solved">
                 <div className="big-number">{userInfo.problemStats.total}</div>
                 <div className="label">Problems Solved</div>
+                <div className="total-available">
+                  out of {userInfo.problemStats.totalAvailable.all} available
+                </div>
               </div>
               <div className="difficulty-breakdown">
                 <div className="difficulty-item">
@@ -255,10 +392,12 @@ const UserInfo = () => {
                   <div className="difficulty-bar-container">
                     <div 
                       className="difficulty-bar easy" 
-                      style={{ width: `${calculatePercentage(userInfo.problemStats.easy, userInfo.problemStats.total)}%` }}
+                      style={{ width: `${calculatePercentage(userInfo.problemStats.easy, userInfo.problemStats.totalAvailable.easy)}%` }}
                     ></div>
                   </div>
-                  <div className="difficulty-count">{userInfo.problemStats.easy}</div>
+                  <div className="difficulty-count">
+                    {userInfo.problemStats.easy} / {userInfo.problemStats.totalAvailable.easy}
+                  </div>
                 </div>
                 <div className="difficulty-item">
                   <div className="difficulty-label medium">
@@ -268,10 +407,12 @@ const UserInfo = () => {
                   <div className="difficulty-bar-container">
                     <div 
                       className="difficulty-bar medium" 
-                      style={{ width: `${calculatePercentage(userInfo.problemStats.medium, userInfo.problemStats.total)}%` }}
+                      style={{ width: `${calculatePercentage(userInfo.problemStats.medium, userInfo.problemStats.totalAvailable.medium)}%` }}
                     ></div>
                   </div>
-                  <div className="difficulty-count">{userInfo.problemStats.medium}</div>
+                  <div className="difficulty-count">
+                    {userInfo.problemStats.medium} / {userInfo.problemStats.totalAvailable.medium}
+                  </div>
                 </div>
                 <div className="difficulty-item">
                   <div className="difficulty-label hard">
@@ -281,16 +422,66 @@ const UserInfo = () => {
                   <div className="difficulty-bar-container">
                     <div 
                       className="difficulty-bar hard" 
-                      style={{ width: `${calculatePercentage(userInfo.problemStats.hard, userInfo.problemStats.total)}%` }}
+                      style={{ width: `${calculatePercentage(userInfo.problemStats.hard, userInfo.problemStats.totalAvailable.hard)}%` }}
                     ></div>
                   </div>
-                  <div className="difficulty-count">{userInfo.problemStats.hard}</div>
+                  <div className="difficulty-count">
+                    {userInfo.problemStats.hard} / {userInfo.problemStats.totalAvailable.hard}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Problem solving distribution visualization */}
+              <div className="problem-distribution">
+                <div className="distribution-title">Distribution</div>
+                <div className="distribution-chart">
+                  <div 
+                    className="distribution-segment easy" 
+                    style={{ width: `${calculatePercentage(userInfo.problemStats.easy, userInfo.problemStats.total)}%` }}
+                    title={`Easy: ${userInfo.problemStats.easy} (${calculatePercentage(userInfo.problemStats.easy, userInfo.problemStats.total)}%)`}
+                  ></div>
+                  <div 
+                    className="distribution-segment medium" 
+                    style={{ width: `${calculatePercentage(userInfo.problemStats.medium, userInfo.problemStats.total)}%` }}
+                    title={`Medium: ${userInfo.problemStats.medium} (${calculatePercentage(userInfo.problemStats.medium, userInfo.problemStats.total)}%)`}
+                  ></div>
+                  <div 
+                    className="distribution-segment hard" 
+                    style={{ width: `${calculatePercentage(userInfo.problemStats.hard, userInfo.problemStats.total)}%` }}
+                    title={`Hard: ${userInfo.problemStats.hard} (${calculatePercentage(userInfo.problemStats.hard, userInfo.problemStats.total)}%)`}
+                  ></div>
+                </div>
+                <div className="distribution-legend">
+                  <div className="legend-item">
+                    <div className="legend-color easy"></div>
+                    <div className="legend-text">Easy: {calculatePercentage(userInfo.problemStats.easy, userInfo.problemStats.total)}%</div>
+                  </div>
+                  <div className="legend-item">
+                    <div className="legend-color medium"></div>
+                    <div className="legend-text">Medium: {calculatePercentage(userInfo.problemStats.medium, userInfo.problemStats.total)}%</div>
+                  </div>
+                  <div className="legend-item">
+                    <div className="legend-color hard"></div>
+                    <div className="legend-text">Hard: {calculatePercentage(userInfo.problemStats.hard, userInfo.problemStats.total)}%</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Acceptance rate */}
+              <div className="acceptance-rate-container">
+                <div className="acceptance-title">Acceptance Rate</div>
+                <div className="acceptance-value">{userInfo.problemStats.acceptanceRate}%</div>
+                <div className="acceptance-bar-container">
+                  <div 
+                    className="acceptance-bar" 
+                    style={{ width: `${Math.min(100, parseFloat(userInfo.problemStats.acceptanceRate))}%` }}
+                  ></div>
                 </div>
               </div>
             </div>
           </div>
 
-          {userInfo.recentContests && userInfo.recentContests.length > 0 && (
+          {userInfo.recentContests && userInfo.recentContests.length > 0 ? (
             <div className="recent-contests-card">
               <h3>Recent Contests</h3>
               <div className="contests-table">
@@ -317,6 +508,14 @@ const UserInfo = () => {
                 })}
               </div>
             </div>
+          ) : (
+            <div className="recent-contests-card empty-card">
+              <h3>Recent Contests</h3>
+              <div className="empty-state">
+                <div className="empty-icon">🏆</div>
+                <p>No contest participation data available</p>
+              </div>
+            </div>
           )}
 
           <div className="activity-insights-card">
@@ -332,7 +531,56 @@ const UserInfo = () => {
                 <div className="insight-value">{userInfo.last30DaysActivity}</div>
                 <div className="insight-label">Problems Last 30 Days</div>
               </div>
+              
+              {/* Star rating */}
+              <div className="insight-item">
+                <div className="insight-icon">⭐</div>
+                <div className="insight-value">{userInfo.starRating.toFixed(1)}</div>
+                <div className="insight-label">Star Rating</div>
+              </div>
+              
+              {/* Acceptance rate */}
+              <div className="insight-item">
+                <div className="insight-icon">✅</div>
+                <div className="insight-value">
+                  {userInfo.problemStats.acceptanceRate}%
+                </div>
+                <div className="insight-label">Acceptance Rate</div>
+              </div>
             </div>
+            
+            {/* Activity summary */}
+            <div className="activity-summary">
+              <div className="summary-title">Activity Summary</div>
+              <div className="summary-text">
+                Solved <strong>{userInfo.problemStats.total}</strong> problems 
+                (<strong>{userInfo.problemStats.easy}</strong> easy, <strong>{userInfo.problemStats.medium}</strong> medium, <strong>{userInfo.problemStats.hard}</strong> hard)
+                with <strong>{userInfo.last30DaysActivity}</strong> submissions in the last 30 days.
+              </div>
+            </div>
+            
+            {/* Badges section */}
+            {userInfo.badges && userInfo.badges.length > 0 && (
+              <div className="badges-container">
+                <div className="badges-title">Badges</div>
+                <div className="badges-grid">
+                  {userInfo.badges.slice(0, 6).map((badge, index) => (
+                    <div 
+                      key={index} 
+                      className={`badge-item ${userInfo.activeBadge && userInfo.activeBadge.id === badge.id ? 'active' : ''}`}
+                      title={`${badge.displayName} - Earned on ${new Date(badge.creationDate).toLocaleDateString()}`}
+                    >
+                      <img 
+                        src={badge.icon.startsWith('/') ? `https://leetcode.com${badge.icon}` : badge.icon} 
+                        alt={badge.displayName} 
+                        className="badge-icon" 
+                      />
+                      <div className="badge-name">{badge.displayName}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

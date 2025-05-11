@@ -26,10 +26,17 @@ const UserInfo = () => {
       // Always fetch fresh data - no caching
       const response = await api.get(`/api/user/info/${userToFetch}`);
       
+      // Debug log to verify API response structure
+      console.log("API Response:", response.data);
+      
       // Process the data
       const userData = response.data.userData || {};
       const contestData = response.data.userContestDetails || {};
       const recentSubmissions = response.data.recentSubmissions || [];
+      
+      // Debug logs for contest data
+      console.log("Contest Data:", contestData);
+      console.log("Contest Ranking History:", contestData.userContestRankingHistory);
       
       // Calculate solved problems by difficulty
       // First check if we have allQuestionsCount for total available problems
@@ -62,7 +69,44 @@ const UserInfo = () => {
       const topPercentage = contestData.userContestRanking?.topPercentage?.toFixed(2) || 'N/A';
       
       // Get recent contests (last 5)
-      const recentContests = contestData.userContestRankingHistory?.filter(contest => contest.attended)?.slice(0, 5) || [];
+      let recentContests = [];
+      if (contestData.userContestRankingHistory && Array.isArray(contestData.userContestRankingHistory)) {
+        recentContests = contestData.userContestRankingHistory
+          .filter(contest => contest.attended)
+          .slice(0, 5);
+      }
+      
+      // Process contest data for display
+      const processedContests = recentContests.map((contest, index, arr) => {
+        // Extract contest name from the nested structure
+        let contestName = 'Unknown Contest';
+        if (contest.contest && contest.contest.title) {
+          contestName = contest.contest.title;
+        } else if (contest.contestName) {
+          contestName = contest.contestName;
+        }
+        
+        // Extract other contest data
+        const ranking = contest.ranking || 'N/A';
+        const score = contest.score || 0;
+        const problemsSolved = contest.problemsSolved || 0;
+        const totalProblems = contest.totalProblems || 0;
+        
+        // Calculate rating change compared to previous contest
+        let ratingChange = '0.00';
+        if (index < arr.length - 1 && contest.rating && arr[index + 1].rating) {
+          ratingChange = (contest.rating - arr[index + 1].rating).toFixed(2);
+        }
+        
+        return {
+          contestName,
+          ranking,
+          score,
+          ratingChange,
+          problemsSolved,
+          totalProblems
+        };
+      });
       
       // Calculate best rank
       let bestRank = Number.MAX_SAFE_INTEGER;
@@ -201,6 +245,7 @@ const UserInfo = () => {
         globalRank,
         topPercentage,
         recentContests,
+        processedContests,
         bestRank: bestRank === Number.MAX_SAFE_INTEGER ? 'N/A' : bestRank,
         bestContestName,
         last30DaysActivity,
@@ -491,21 +536,33 @@ const UserInfo = () => {
                   <div className="contest-cell">Score</div>
                   <div className="contest-cell">Rating Change</div>
                 </div>
-                {userInfo.recentContests.map((contest, index) => {
-                  const ratingChange = contest.rating - (userInfo.recentContests[index + 1]?.rating || contest.rating);
-                  const isPositive = ratingChange > 0;
-                  
-                  return (
-                    <div key={index} className="contest-row">
-                      <div className="contest-cell contest-name">{contest.contestName}</div>
-                      <div className="contest-cell">{contest.ranking}</div>
-                      <div className="contest-cell">{contest.score}</div>
-                      <div className={`contest-cell rating-change ${isPositive ? 'positive' : 'negative'}`}>
-                        {isPositive ? '+' : ''}{ratingChange.toFixed(2)}
+                {userInfo.processedContests && userInfo.processedContests.length > 0 ? (
+                  userInfo.processedContests.map((contest, index) => {
+                    const isPositive = parseFloat(contest.ratingChange) > 0;
+                    
+                    return (
+                      <div key={index} className="contest-row">
+                        <div className="contest-cell contest-name">{contest.contestName}</div>
+                        <div className="contest-cell">{contest.ranking}</div>
+                        <div className="contest-cell">
+                          {contest.score}
+                          {contest.problemsSolved > 0 && contest.totalProblems > 0 && 
+                            ` (${contest.problemsSolved}/${contest.totalProblems})`
+                          }
+                        </div>
+                        <div className={`contest-cell rating-change ${isPositive ? 'positive' : 'negative'}`}>
+                          {isPositive ? '+' : ''}{contest.ratingChange}
+                        </div>
                       </div>
+                    );
+                  })
+                ) : (
+                  <div className="contest-row">
+                    <div className="contest-cell" style={{ gridColumn: '1 / -1', justifyContent: 'center' }}>
+                      Processing contest data...
                     </div>
-                  );
-                })}
+                  </div>
+                )}
               </div>
             </div>
           ) : (

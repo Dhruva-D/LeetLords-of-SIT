@@ -67,8 +67,8 @@ const TopThreeLeaders = ({ leaders }) => {
             {profileIcons[position]}
           </div>
           <div className="player-info">
-            <h3 className="player-name">{leader.name}</h3>
-            <p className="player-username">@{leader.username}</p>
+            <h3 className="player-name" title={leader.name}>{leader.name}</h3>
+            <p className="player-username" title={leader.username}>@{leader.username}</p>
             <div className="player-rating">{leader.rating}</div>
           </div>
           <div className="medal-container">

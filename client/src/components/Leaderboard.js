@@ -298,13 +298,13 @@ const Leaderboard = () => {
             <table>
               <thead>
                 <tr>
-                  <th>SIT Rank</th>
-                  <th>Global Rank</th>
-                  <th>Name</th>
-                  <th>Username</th>
-                  <th>USN</th>
-                  <th>Rating</th>
-                  {activeView === 'weekly' && <th>Trend</th>}
+                  <th className="rank-column">SIT Rank</th>
+                  <th className="rank-column">Global</th>
+                  <th className="name-column">Name</th>
+                  <th className="username-column">Username</th>
+                  <th className="usn-column">USN</th>
+                  <th className="rating-column">Rating</th>
+                  {activeView === 'weekly' && <th className="trend-column">Trend</th>}
                 </tr>
               </thead>
               <tbody>
@@ -314,15 +314,15 @@ const Leaderboard = () => {
                     className="leaderboard-row"
                     style={{"--row-index": index}}
                   >
-                    <td>
+                    <td className="rank-column">
                       {renderRankIcon(index + 1)}
                     </td>
-                    <td>{user.rank}</td>
-                    <td>{user.name}</td>
-                    <td>{user.username}</td>
-                    <td>{user.usn}</td>
-                    <td>{user.rating}</td>
-                    {activeView === 'weekly' && <td>{user.trend}</td>}
+                    <td className="rank-column">{user.rank}</td>
+                    <td className="name-column" title={user.name}>{user.name}</td>
+                    <td className="username-column" title={user.username}>{user.username}</td>
+                    <td className="usn-column" title={user.usn}>{user.usn}</td>
+                    <td className="rating-column">{user.rating}</td>
+                    {activeView === 'weekly' && <td className="trend-column">{user.trend}</td>}
                   </tr>
                 ))}
               </tbody>

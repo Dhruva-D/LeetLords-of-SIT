@@ -3,7 +3,7 @@
   width: 100%;
   margin: 0.5rem auto 2rem;
   padding: 2rem 1rem 2rem;
-  min-height: 300px;
+  min-height: 280px;
   border-radius: 16px;
   overflow: visible;
   background: #FFFFFF;
@@ -415,11 +415,11 @@
   }
 
   .two-leaders .podium-wrapper {
-    gap: 1.5rem;
+    gap: 1rem;
   }
 
   .two-leaders .first-place .player-card {
-    width: 150px;
+    width: 160px;
   }
 
   .two-leaders .second-place .player-card {
@@ -428,12 +428,12 @@
 
   .single-leader .first-place,
   .two-leaders .first-place {
-    transform: scale(1);
+    margin-bottom: 1rem;
   }
 
   .top-three-container {
-    margin: 4rem auto 1.5rem;
-    padding: 2.5rem 0.5rem 1.5rem;
+    padding: 1.5rem 1rem 1.5rem;
+    min-height: 240px;
   }
 
   .player-card {
@@ -441,9 +441,69 @@
   }
 
   .avatar {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 0.7rem;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 0.8rem;
+  }
+
+  .first-place .avatar {
+    width: 75px;
+    height: 75px;
+  }
+
+  .player-info {
+    padding: 0 0.5rem;
+  }
+
+  .podium-block {
+    height: 30px;
+  }
+
+  .medal {
+    font-size: 4rem;
+  }
+
+  .gold-medal,
+  .silver-medal,
+  .bronze-medal {
+    font-size: 4rem;
+  }
+
+  .medal-container {
+    bottom: -25px;
+  }
+
+  .crown-1 {
+    top: -75px;
+    width: 120px;
+    height: 120px;
+  }
+
+  .crown-2 {
+    top: -35px;
+    width: 70px;
+    height: 70px;
+  }
+
+  .crown-3 {
+    top: -30px;
+    width: 70px;
+    height: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .podium-wrapper {
+    gap: 0.8rem;
+  }
+
+  .first-place .player-card {
+    width: 140px;
+  }
+
+  .second-place .player-card, 
+  .third-place .player-card {
+    width: 110px;
   }
 
   .first-place .avatar {
@@ -451,26 +511,37 @@
     height: 65px;
   }
 
-  .player-info {
-    margin-bottom: 0.5rem;
+  .avatar {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 0.6rem;
   }
 
-  .podium-block {
-    margin-top: 1.2rem;
+  .player-name {
+    font-size: 0.9rem;
   }
 
-  .medal {
-    font-size: 3.5rem;
+  .first-place .player-name {
+    font-size: 1.1rem;
   }
 
-  .gold-medal,
-  .silver-medal,
-  .bronze-medal {
-    font-size: 3rem;
+  .player-username {
+    font-size: 0.75rem;
   }
 
-  .medal-container {
-    bottom: -20px;
+  .first-place .player-username {
+    font-size: 0.85rem;
+  }
+
+  .player-rating {
+    font-size: 1rem;
+    padding: 0.25rem 0.6rem;
+    margin-bottom: 10px;
+  }
+
+  .first-place .player-rating {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
   }
 
   .crown-1 {
@@ -479,15 +550,168 @@
     height: 100px;
   }
 
-  .crown-2 {
+  .crown-2, .crown-3 {
     top: -30px;
-    width: 45px;
-    height: 45px;
+    width: 60px;
+    height: 60px;
   }
 
-  .crown-3 {
+  .medal {
+    font-size: 3.5rem;
+  }
+  
+  .medal-container {
+    bottom: -20px;
+  }
+}
+
+@media (max-width: 400px) {
+  .top-three-container {
+    padding: 1.2rem 0.8rem 1.2rem;
+    min-height: 220px;
+    margin-bottom: 1.5rem;
+  }
+
+  .podium-wrapper {
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .first-place .player-card {
+    width: 120px;
+  }
+
+  .second-place .player-card, 
+  .third-place .player-card {
+    width: 95px;
+  }
+
+  .first-place .avatar {
+    width: 55px;
+    height: 55px;
+  }
+
+  .avatar {
+    width: 45px;
+    height: 45px;
+    margin-bottom: 0.5rem;
+  }
+
+  .player-name {
+    font-size: 0.8rem;
+  }
+
+  .first-place .player-name {
+    font-size: 0.9rem;
+  }
+
+  .player-username {
+    font-size: 0.7rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .first-place .player-username {
+    font-size: 0.75rem;
+  }
+
+  .player-rating {
+    font-size: 0.9rem;
+    padding: 0.2rem 0.5rem;
+    margin-bottom: 8px;
+  }
+
+  .first-place .player-rating {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  .crown-1 {
+    top: -55px;
+    width: 80px;
+    height: 80px;
+  }
+
+  .crown-2, .crown-3 {
     top: -25px;
-    width: 35px;
-    height: 35px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .medal {
+    font-size: 3rem;
+  }
+
+  .medal-container {
+    bottom: -15px;
+  }
+
+  .podium-block {
+    height: 25px;
+  }
+
+  .first-place .podium-block {
+    height: 40px;
+  }
+
+  .second-place .podium-block {
+    height: 25px;
+  }
+
+  .third-place .podium-block {
+    height: 15px;
+  }
+}
+
+/* Landscape orientation fixes for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .top-three-container {
+    padding: 1rem 1rem 1rem;
+    min-height: 220px;
+  }
+  
+  .podium-wrapper {
+    margin-top: 1rem;
+  }
+  
+  .first-place .player-card {
+    width: 150px;
+  }
+  
+  .second-place .player-card, 
+  .third-place .player-card {
+    width: 120px;
+  }
+  
+  .podium-block {
+    height: 40px;
+    margin-top: 1rem;
+  }
+  
+  .first-place .podium-block {
+    height: 60px;
+  }
+  
+  .second-place .podium-block {
+    height: 40px;
+  }
+  
+  .third-place .podium-block {
+    height: 25px;
+  }
+  
+  .crown-1 {
+    top: -55px;
+    width: 90px;
+    height: 90px;
+  }
+  
+  .avatar {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .first-place .avatar {
+    width: 65px;
+    height: 65px;
   }
 } 

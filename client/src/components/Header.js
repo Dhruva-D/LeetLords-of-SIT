@@ -1,24 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Header.css';
 
 const Header = () => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const navRef = useRef(null);
+  const toggleRef = useRef(null);
 
-  const toggleMenu = () => {
+  const toggleMenu = (e) => {
+    e.stopPropagation(); // Prevent event from bubbling up
     setMenuOpen(!menuOpen);
-    // Toggle body scroll when menu is open
+    // Toggle body class for overflow and fixed content
     if (!menuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.classList.add('menu-open');
     } else {
-      document.body.style.overflow = '';
+      document.body.classList.remove('menu-open');
     }
   };
 
   // Close menu when route changes
   useEffect(() => {
-    document.body.style.overflow = '';
+    document.body.classList.remove('menu-open');
     setMenuOpen(false);
     
     return () => {
@@ -28,32 +31,38 @@ const Header = () => {
 
   // Handle clicks outside the menu to close it
   const handleOutsideClick = (e) => {
-    const nav = document.querySelector('nav');
-    const toggle = document.querySelector('.mobile-menu-toggle');
-    
-    if (nav && toggle && !nav.contains(e.target) && !toggle.contains(e.target)) {
+    if (
+      navRef.current && 
+      toggleRef.current && 
+      !navRef.current.contains(e.target) && 
+      !toggleRef.current.contains(e.target)
+    ) {
       setMenuOpen(false);
-      document.body.style.overflow = '';
+      document.body.classList.remove('menu-open');
     }
   };
 
   // Add event listener when menu is open
   useEffect(() => {
     if (menuOpen) {
-      document.addEventListener('click', handleOutsideClick);
+      // Small delay to avoid immediate trigger
+      setTimeout(() => {
+        document.addEventListener('click', handleOutsideClick);
+      }, 100);
     } else {
       document.removeEventListener('click', handleOutsideClick);
     }
     
     return () => {
       document.removeEventListener('click', handleOutsideClick);
-      document.body.style.overflow = '';
+      document.body.classList.remove('menu-open');
     };
   }, [menuOpen]);
 
-  const handleLinkClick = () => {
+  const handleLinkClick = (e) => {
+    e.stopPropagation(); // Prevent event from bubbling up
     setMenuOpen(false);
-    document.body.style.overflow = '';
+    document.body.classList.remove('menu-open');
   };
 
   return (
@@ -70,13 +79,14 @@ const Header = () => {
           onClick={toggleMenu}
           aria-expanded={menuOpen}
           aria-label="Toggle navigation menu"
+          ref={toggleRef}
         >
           <span></span>
           <span></span>
           <span></span>
         </button>
 
-        <nav className={menuOpen ? 'active' : ''}>
+        <nav className={menuOpen ? 'active' : ''} ref={navRef}>
           <Link to="/leaderboard" className={location.pathname === '/leaderboard' ? 'active' : ''} onClick={handleLinkClick}>
             Leaderboard
           </Link>

@@ -134,6 +134,7 @@ tr:hover {
   transform: translateZ(10px);
   transform-style: preserve-3d;
   animation: pulseGlow 3s infinite;
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
@@ -158,6 +159,10 @@ th {
   text-overflow: ellipsis;
 }
 
+th.rank-column {
+  text-align: center;
+}
+
 td {
   padding: 1rem;
   border-bottom: 1px solid #EDE9FE;
@@ -171,9 +176,22 @@ td {
   max-width: 0;
 }
 
+td.rank-column {
+  text-align: center;
+}
+
+/* Icon centering in rank column */
+.leaderboard-row td.rank-column:first-child {
+  padding: 0.75rem 0.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Column width settings */
 .rank-column {
   width: 70px;
+  min-width: 70px;
 }
 
 .name-column {
@@ -200,6 +218,8 @@ td {
 .leaderboard-row td:first-child {
   display: flex;
   align-items: center;
+  padding-left: 0.5rem;
+  justify-content: center;
 }
 
 .loading-container {
@@ -438,7 +458,8 @@ td {
 /* Responsive styles - Mobile */
 @media (max-width: 768px) {
   .leaderboards-container {
-    padding: 1rem;
+    padding: 70px 1rem 1rem 1rem;
+    min-height: calc(100vh - 60px);
   }
   
   .content {
@@ -463,13 +484,19 @@ td {
   
   .table-container {
     margin-top: 1.5rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    width: calc(100% + 2rem);
     overflow-x: auto;
-    border-radius: 10px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
   }
   
   table {
-    table-layout: auto;
+    table-layout: fixed;
     width: 100%;
+    min-width: 600px;
   }
   
   th, td {
@@ -508,10 +535,22 @@ td {
   }
   
   .rank-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 0.8rem;
     width: 25px;
     height: 25px;
     min-width: 25px;
-    font-size: 0.8rem;
+  }
+  
+  .leaderboard-row td.rank-column:first-child {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .medal {
+    font-size: 1.5rem;
   }
   
   .user-form {
@@ -529,10 +568,6 @@ td {
   
   .user-form button {
     width: 100%;
-  }
-  
-  .medal {
-    font-size: 1.5rem;
   }
   
   .refresh-button {
@@ -560,12 +595,13 @@ td {
 /* Responsive styles - Small phones */
 @media (max-width: 480px) {
   .leaderboards-container {
-    padding: 0.5rem;
+    padding: 65px 0.75rem 0.75rem 0.75rem;
   }
   
   .content {
     padding: 1rem 0.5rem;
     border-radius: 10px;
+    margin-top: 0;
   }
   
   .leaderboard-title {
@@ -627,7 +663,10 @@ td {
     height: 22px;
     min-width: 22px;
     font-size: 0.7rem;
-    line-height: 22px;
+  }
+  
+  .medal {
+    font-size: 1.3rem;
   }
   
   .loading-container {
@@ -651,6 +690,10 @@ td {
 
 /* Very small screens */
 @media (max-width: 360px) {
+  .leaderboards-container {
+    padding: 60px 0.5rem 0.5rem 0.5rem;
+  }
+  
   .leaderboard-title {
     font-size: 1.5rem;
   }
@@ -698,8 +741,11 @@ td {
     width: 20px;
     height: 20px;
     min-width: 20px;
-    font-size: 0.6rem;
-    line-height: 20px;
+    font-size: 0.65rem;
+  }
+  
+  .medal {
+    font-size: 1.2rem;
   }
   
   .user-form input {
@@ -728,12 +774,20 @@ td {
   background: linear-gradient(135deg, #8B5CF6 30%, #6D28D9 100%);
   box-shadow: 0 2px 5px rgba(109, 40, 217, 0.3);
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .medal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
   font-size: 2rem;
-  margin-right: 0.5rem;
-  display: inline-block;
+  margin: 0;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
@@ -780,6 +834,9 @@ td {
 @media screen and (max-width: 600px) {
   .table-container {
     margin-top: 1rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    width: calc(100% + 2rem);
   }
   
   .leaderboard-header {
@@ -801,13 +858,24 @@ td {
   .leaderboards-container {
     padding: 0.75rem;
   }
+  
+  table {
+    min-width: 500px;
+  }
 }
 
-/* Fix scrolling on iOS devices */
+/* Table specific mobile improvements */
 @media screen and (max-width: 480px) {
   .table-container {
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    overflow-x: auto;
+    max-width: 100%;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    width: calc(100% + 1rem);
+    padding: 0 0.5rem;
+    border-radius: 0;
   }
   
   .table-container::-webkit-scrollbar {
@@ -816,5 +884,145 @@ td {
   
   table {
     transform: none;
+    min-width: 450px;
+    width: 100%;
+    table-layout: fixed;
+  }
+  
+  th, td {
+    padding: 0.5rem 0.3rem;
+    font-size: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .rank-column {
+    width: 40px;
+    min-width: 40px;
+  }
+  
+  .name-column {
+    width: 70px;
+    min-width: 70px;
+  }
+  
+  .username-column {
+    width: 70px;
+    min-width: 70px;
+  }
+  
+  .usn-column {
+    width: 60px;
+    min-width: 60px;
+  }
+  
+  .rating-column {
+    width: 50px;
+    min-width: 50px;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .table-container {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    width: calc(100% + 1rem);
+  }
+  
+  table {
+    min-width: 400px;
+  }
+  
+  .leaderboard-row td:first-child {
+    padding-left: 0.3rem;
+  }
+  
+  th, td {
+    padding: 0.4rem 0.2rem;
+    font-size: 0.7rem;
+  }
+  
+  .rank-column {
+    width: 35px;
+    min-width: 35px;
+  }
+  
+  .name-column {
+    width: 65px;
+    min-width: 65px;
+  }
+  
+  .username-column {
+    width: 65px;
+    min-width: 65px;
+  }
+  
+  .usn-column {
+    width: 55px;
+    min-width: 55px;
+  }
+  
+  .rating-column {
+    width: 45px;
+    min-width: 45px;
+  }
+}
+
+/* Fix table display on very small screens */
+@media screen and (max-width: 320px) {
+  .leaderboards-container {
+    padding: 0.5rem;
+  }
+  
+  .content {
+    padding: 1rem 0.5rem;
+  }
+  
+  .table-container {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    width: calc(100% + 1rem);
+    padding: 0;
+  }
+  
+  table {
+    min-width: 350px;
+  }
+  
+  .rank-column {
+    width: 30px;
+    min-width: 30px;
+  }
+  
+  .name-column {
+    width: 60px;
+    min-width: 60px;
+  }
+  
+  .username-column {
+    width: 60px;
+    min-width: 60px;
+  }
+  
+  .rating-column {
+    width: 40px;
+    min-width: 40px;
+  }
+}
+
+/* Laptop screens */
+@media (max-width: 1366px) and (min-width: 1025px) {
+  th, td {
+    padding: 0.9rem 0.6rem;
+  }
+  
+  .rank-column {
+    width: 80px;
+    min-width: 80px;
+  }
+  
+  .leaderboard-row td.rank-column:first-child {
+    padding: 0.75rem 0.5rem;
   }
 } 

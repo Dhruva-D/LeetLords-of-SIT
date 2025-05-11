@@ -26,6 +26,7 @@ const Leaderboard = () => {
   const location = useLocation();
   const [activeView, setActiveView] = useState('all-time'); // 'all-time' or 'weekly'
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -231,6 +232,18 @@ const Leaderboard = () => {
     return `${ordinalDay} ${month} ${year}, ${formattedHours}:${formattedMinutes} ${amPm}`;
   };
 
+  // Add window resize listener
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -302,7 +315,7 @@ const Leaderboard = () => {
                   <th className="rank-column">Global</th>
                   <th className="name-column">Name</th>
                   <th className="username-column">Username</th>
-                  <th className="usn-column">USN</th>
+                  {windowWidth > 480 && <th className="usn-column">USN</th>}
                   <th className="rating-column">Rating</th>
                   {activeView === 'weekly' && <th className="trend-column">Trend</th>}
                 </tr>
@@ -320,7 +333,7 @@ const Leaderboard = () => {
                     <td className="rank-column">{user.rank}</td>
                     <td className="name-column" title={user.name}>{user.name}</td>
                     <td className="username-column" title={user.username}>{user.username}</td>
-                    <td className="usn-column" title={user.usn}>{user.usn}</td>
+                    {windowWidth > 480 && <td className="usn-column" title={user.usn}>{user.usn}</td>}
                     <td className="rating-column">{user.rating}</td>
                     {activeView === 'weekly' && <td className="trend-column">{user.trend}</td>}
                   </tr>

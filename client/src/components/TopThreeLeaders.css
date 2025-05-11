@@ -1,8 +1,8 @@
 .top-three-container {
   position: relative;
   width: 100%;
-  margin: 6rem auto 2rem;
-  padding: 4rem 1rem 2rem;
+  margin: 0.5rem auto 2rem;
+  padding: 2rem 1rem 2rem;
   min-height: 300px;
   border-radius: 16px;
   overflow: visible;
@@ -289,13 +289,13 @@
 }
 
 .second-place .podium-block {
-  height: 70px;
+  height: 80px;
   background: linear-gradient(to bottom, #DDD6FE, #C4B5FD);
   transform: translateZ(6px);
 }
 
 .third-place .podium-block {
-  height: 55px;
+  height: 65px;
   background: linear-gradient(to bottom, #EDE9FE, #DDD6FE);
   transform: translateZ(4px);
 }
@@ -313,19 +313,57 @@
   animation-delay: 0.4s;
 }
 
-/* Responsive Design */
+/* Styles for different leader counts */
+.single-leader .podium-wrapper {
+  justify-content: center;
+}
+
+.single-leader .first-place {
+  transform: scale(1.1);
+}
+
+.single-leader .first-place .player-card {
+  width: 200px;
+}
+
+.two-leaders .podium-wrapper {
+  justify-content: center;
+  gap: 2.5rem;
+}
+
+.two-leaders .first-place {
+  transform: scale(1.05);
+}
+
+.two-leaders .first-place .player-card {
+  width: 190px;
+}
+
+.two-leaders .second-place .player-card {
+  width: 160px;
+}
+
+.three-leaders .podium-wrapper {
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+/* Responsive styles for different leader counts */
 @media (max-width: 768px) {
-  .podium-wrapper {
-    gap: 1rem;
+  .single-leader .first-place .player-card {
+    width: 180px;
   }
 
-  .first-place .player-card {
-    width: 160px;
+  .two-leaders .podium-wrapper {
+    gap: 2rem;
   }
 
-  .second-place .player-card, 
-  .third-place .player-card {
-    width: 130px;
+  .two-leaders .first-place .player-card {
+    width: 170px;
+  }
+
+  .two-leaders .second-place .player-card {
+    width: 150px;
   }
 
   .avatar {
@@ -356,8 +394,6 @@
     height: 45px;
   }
 
-
-
   .medal {
     font-size: 4.5rem;
   }
@@ -374,22 +410,30 @@
 }
 
 @media (max-width: 576px) {
+  .single-leader .first-place .player-card {
+    width: 160px;
+  }
+
+  .two-leaders .podium-wrapper {
+    gap: 1.5rem;
+  }
+
+  .two-leaders .first-place .player-card {
+    width: 150px;
+  }
+
+  .two-leaders .second-place .player-card {
+    width: 130px;
+  }
+
+  .single-leader .first-place,
+  .two-leaders .first-place {
+    transform: scale(1);
+  }
+
   .top-three-container {
     margin: 4rem auto 1.5rem;
     padding: 2.5rem 0.5rem 1.5rem;
-  }
-
-  .podium-wrapper {
-    gap: 0.5rem;
-  }
-
-  .first-place .player-card {
-    width: 140px;
-  }
-
-  .second-place .player-card, 
-  .third-place .player-card {
-    width: 110px;
   }
 
   .player-card {
@@ -445,10 +489,5 @@
     top: -25px;
     width: 35px;
     height: 35px;
-  }
-
-  .top-three-container {
-    margin: 5rem auto 3rem;
-    padding: 2rem 1rem 2rem;
   }
 } 

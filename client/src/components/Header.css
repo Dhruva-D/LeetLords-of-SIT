@@ -1,27 +1,43 @@
 .header {
-  background-color: var(--color-bg-secondary);
+  background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
   padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: var(--shadow-md);
-  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+  border-bottom: 1px solid rgba(215, 180, 254, 0.3);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
 }
 
 .header h1 {
-  color: var(--color-accent-primary);
+  color: white;
   font-size: 1.8rem;
   font-weight: 700;
   margin: 0;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   cursor: pointer;
   white-space: nowrap;
   transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo-icon {
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+  animation: float 3s ease-in-out infinite;
 }
 
 .header h1:hover {
@@ -30,20 +46,28 @@
 
 .header nav {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   align-items: center;
 }
 
 .header nav a {
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
   font-size: 1rem;
   font-weight: 500;
-  padding: 0.5rem 0.75rem;
+  padding: 0.6rem 1rem;
   border-radius: var(--radius-md);
-  transition: var(--transition-normal);
+  transition: all 0.3s ease;
   position: relative;
+  display: flex;
+  align-items: center;
   overflow: hidden;
+}
+
+.nav-icon {
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+  transition: transform 0.3s ease;
 }
 
 .header nav a:before {
@@ -52,31 +76,61 @@
   bottom: 0;
   left: 50%;
   width: 0;
-  height: 2px;
-  background: var(--gradient-primary);
+  height: 3px;
+  background: white;
   transition: width 0.3s ease, left 0.3s ease;
+  border-radius: 3px;
 }
 
 .header nav a:hover:before {
-  width: 100%;
-  left: 0;
+  width: 80%;
+  left: 10%;
 }
 
 .header nav a:hover {
-  color: var(--color-accent-primary);
-  background-color: rgba(123, 97, 255, 0.05);
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
 }
 
+.header nav a:hover .nav-icon {
+  transform: scale(1.2);
+}
+
 .header nav a.active {
-  color: var(--color-accent-primary);
-  background-color: rgba(123, 97, 255, 0.1);
+  color: white;
+  background-color: rgba(255, 255, 255, 0.15);
   font-weight: 600;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .header nav a.active:before {
+  width: 80%;
+  left: 10%;
+}
+
+.mobile-menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  cursor: pointer;
+}
+
+.mobile-menu-toggle span {
+  display: block;
   width: 100%;
-  left: 0;
+  height: 3px;
+  background-color: white;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
 }
 
 /* Debug alert styles */
@@ -108,24 +162,59 @@
 /* Mobile responsive styles */
 @media (max-width: 768px) {
   .header {
-    flex-direction: column;
     padding: 1rem;
-    gap: 1rem;
+  }
+  
+  .header-content {
+    position: relative;
   }
 
-  .header h1 {
-    font-size: 1.5rem;
+  .mobile-menu-toggle {
+    display: flex;
+    z-index: 1001;
   }
 
   .header nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    flex-direction: column;
+    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
     width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+    max-width: 300px;
+    padding: 1rem;
+    border-radius: 0 0 0 var(--radius-md);
+    box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    gap: 0.5rem;
+  }
+
+  .header nav.active {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: all;
   }
 
   .header nav a {
-    font-size: 0.9rem;
-    padding: 0.4rem 0.6rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+
+  .header nav a:before {
+    bottom: auto;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+  }
+
+  .header nav a:hover:before,
+  .header nav a.active:before {
+    width: 3px;
+    height: 100%;
+    left: 0;
   }
 } 

@@ -3,13 +3,13 @@ import './TopThreeLeaders.css';
 import crownImage from '../assets/images/crown.png';
 
 const TopThreeLeaders = ({ leaders }) => {
-  // If there are no leaders or less than 3, return null
-  if (!leaders || leaders.length < 3) {
+  // If there are no leaders, return null
+  if (!leaders || leaders.length === 0) {
     return null;
   }
 
-  // Get the top 3 leaders
-  const topThree = leaders.slice(0, 3);
+  // Get up to 3 leaders
+  const topLeaders = leaders.slice(0, 3);
 
   // Medal icons
   const medalIcons = {
@@ -45,6 +45,8 @@ const TopThreeLeaders = ({ leaders }) => {
 
   // Render a podium position
   const PodiumPosition = ({ leader, position }) => {
+    if (!leader) return null;
+
     const positionClasses = {
       1: 'first-place',
       2: 'second-place',
@@ -78,15 +80,40 @@ const TopThreeLeaders = ({ leaders }) => {
     );
   };
 
+  // Function to get the appropriate layout class based on number of leaders
+  const getLayoutClass = () => {
+    switch (topLeaders.length) {
+      case 1:
+        return 'single-leader';
+      case 2:
+        return 'two-leaders';
+      default:
+        return 'three-leaders';
+    }
+  };
+
   return (
-    <div className="top-three-container">
+    <div className={`top-three-container ${getLayoutClass()}`}>
       <div className="animated-background">
         <div className="particles"></div>
       </div>
       <div className="podium-wrapper">
-        <PodiumPosition leader={topThree[1]} position={2} />
-        <PodiumPosition leader={topThree[0]} position={1} />
-        <PodiumPosition leader={topThree[2]} position={3} />
+        {topLeaders.length >= 2 && (
+          <PodiumPosition 
+            leader={topLeaders[1]} 
+            position={2} 
+          />
+        )}
+        <PodiumPosition 
+          leader={topLeaders[0]} 
+          position={1} 
+        />
+        {topLeaders.length >= 3 && (
+          <PodiumPosition 
+            leader={topLeaders[2]} 
+            position={3} 
+          />
+        )}
       </div>
     </div>
   );
